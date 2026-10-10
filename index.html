@@ -41,7 +41,6 @@
 <script type="module">
 import { PREGUNTAS } from "./preguntas.js";
 import { datos, contar, idCliente } from "./datos.js";
-import { CONFIGURADO } from "./config.js";
 
 const $ = (id) => document.getElementById(id);
 const porId = Object.fromEntries(PREGUNTAS.map((p) => [p.id, p]));
@@ -52,13 +51,13 @@ let pintada = null;      // id de la pregunta ya montada en el DOM
 let miVoto = null;
 let editando = false;
 
-function avisoLocal() {
-  if (CONFIGURADO) return;
+function avisarSiAislado(res) {
+  if (!res || res.modo !== "local") return;
   const a = $("aviso");
   a.classList.remove("oculto");
-  a.innerHTML = "<strong>Modo ensayo.</strong> No hay Firebase configurado en <code>config.js</code>, " +
-    "así que los votos solo se comparten entre pestañas de este mismo navegador. " +
-    "Para la charla real, completa <code>config.js</code> (ver README).";
+  a.innerHTML = "<strong>Sin conexión con la sala.</strong> No se ha podido alcanzar ningún " +
+    "servidor, así que su voto no llegará al recuento. Compruebe la conexión a internet " +
+    "y vuelva a cargar la página.";
 }
 
 function montar(p) {
@@ -143,10 +142,10 @@ function pintar() {
 
 $("cambiar").addEventListener("click", () => { editando = true; pintar(); });
 
-avisoLocal();
 idCliente();
 
-datos.conectar().then(() => {
+datos.conectar().then((res) => {
+  avisarSiAislado(res);
   datos.escucharEstado((e) => { estado = e; pintar(); });
   datos.escucharVotos((v) => { votos = v; pintar(); });
 }).catch((err) => {

@@ -56,7 +56,7 @@
 <script type="module">
 import { PREGUNTAS } from "./preguntas.js";
 import { datos, contar } from "./datos.js";
-import { CONFIGURADO, CLAVE_CONTROL } from "./config.js";
+import { CLAVE_CONTROL } from "./config.js";
 
 const $ = (id) => document.getElementById(id);
 const porId = Object.fromEntries(PREGUNTAS.map((p) => [p.id, p]));
@@ -147,9 +147,7 @@ function marcarMandos() {
 
 if (mando) {
   $("mandos").classList.remove("oculto");
-  $("modo").textContent = CONFIGURADO
-    ? "Sala en línea (Firebase)"
-    : "MODO ENSAYO — sin Firebase, los votos no salen de este navegador";
+  $("modo").textContent = "Conectando…";
   document.querySelectorAll("[data-ir]").forEach((b) => {
     b.addEventListener("click", () =>
       datos.fijarEstado({ pregunta: b.dataset.ir || null, revelada: false })
@@ -170,7 +168,8 @@ if (mando) {
   });
 }
 
-datos.conectar().then(() => {
+datos.conectar().then((res) => {
+  if (mando) $("modo").textContent = res.detalle || res.modo;
   datos.escucharEstado((e) => { estado = e; pintar(); });
   datos.escucharVotos((v) => { votos = v; pintar(); });
 }).catch((err) => {

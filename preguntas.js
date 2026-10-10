@@ -10,32 +10,36 @@ export const SESION = {
 export const PREGUNTAS = [
   {
     id: "p1",
-    etiqueta: "Caso 1 · Pared abdominal",
+    etiqueta: "Caso 1 · Desmoide pélvico y gestación",
     enunciado:
-      "Mujer de 44 años. Tumor desmoide de 4,8 cm en el músculo recto anterior derecho, " +
-      "descubierto dos años después de una histerectomía. Molestias locales leves, sin " +
-      "compromiso visceral. Biopsia: fibromatosis tipo desmoide.",
-    pregunta: "¿Cuál es su primera recomendación?",
+      "Gestante. En la ecografía de la semana 20 se detecta una masa pélvica de 8 cm. La RM " +
+      "describe una tumoración mesorrectal que se extiende hacia la fosa isquiorrectal derecha " +
+      "atravesando el plano del elevador, con efecto masa y sin infiltración de las estructuras " +
+      "adyacentes. Asintomática. Biopsia: fibromatosis tipo desmoide.",
+    pregunta: "¿Cuál es su actitud?",
     opciones: [
-      { id: "A", texto: "Resección quirúrgica amplia con margen R0 y reconstrucción con malla" },
-      { id: "B", texto: "Nirogacestat de entrada" },
-      { id: "C", texto: "Vigilancia activa con RM a los 3-6 meses" },
-      { id: "D", texto: "Radioterapia externa" },
-      { id: "E", texto: "Doxorrubicina liposomal" },
+      { id: "A", texto: "Resección quirúrgica de la masa en el mismo acto de la cesárea" },
+      { id: "B", texto: "Interrupción de la gestación e inicio de tratamiento sistémico" },
+      { id: "C", texto: "Confirmación histológica y vigilancia estricta, difiriendo la decisión al posparto" },
+      { id: "D", texto: "Radioterapia pélvica tras el parto" },
+      { id: "E", texto: "Tamoxifeno durante la gestación para frenar el crecimiento" },
     ],
     correcta: "C",
     clave:
-      "La vigilancia activa es el estándar inicial en toda fibromatosis desmoide no complicada, " +
-      "también en la pared abdominal.",
+      "En el desmoide diagnosticado durante la gestación se vigila: el parto seguro es posible " +
+      "y la regresión espontánea posparto es frecuente.",
     explicacion:
-      "En el ensayo GRAFITI (n=105, 35% de pared abdominal) el 70% de los pacientes no precisó " +
-      "tratamiento activo a 3 años, y la mutación S45F fue el único predictor independiente de " +
-      "pasar a tratamiento (HR 4,64). En la serie de Salas, el 32% se estabiliza y el 28% regresa " +
-      "espontáneamente. La cirugía se reserva al fracaso de la vigilancia: en pared abdominal es " +
-      "entonces la opción preferente, con recidiva local históricamente baja (5-8%). Un margen R1 " +
-      "microscópico no obliga a reintervenir ni a radioterapia adyuvante: se vuelve a vigilancia.",
+      "Los desmoides diagnosticados en el embarazo progresan con frecuencia durante la gestación, " +
+      "pero la regresión espontánea posparto es muy común, y ni los estrógenos ni los " +
+      "anticonceptivos han demostrado influir en el curso de la enfermedad. El consenso recomienda " +
+      "vigilancia estricta: el parto es seguro —vaginal o por cesárea según criterio obstétrico— y " +
+      "la cirugía abdominal se reserva al posparto, y solo si fracasa la estabilización. Resecar en " +
+      "el mismo acto de la cesárea añade morbilidad sobre un campo ya intervenido y, en el desmoide, " +
+      "el trauma quirúrgico es en sí mismo un estímulo. En la estratificación por sublocalización, " +
+      "la pelvis es categoría de riesgo intermedio: 68,7% de supervivencia libre de evento a 5 años, " +
+      "con decisión individualizada (47,4% cirugía, 31,6% sistémico, 21,1% vigilancia).",
     referencias:
-      "Schut AR. Ann Surg 2023 (GRAFITI) · Salas S. J Clin Oncol 2011 · Kasper B. JAMA Oncol 2024",
+      "Kasper B. JAMA Oncol 2024 · Lozano Lominchar P, Crago AM et al. Serie MSKCC 1993-2023",
   },
   {
     id: "p2",
