@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Presentador · Tumores desmoides intraabdominales · CNC 2026</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<div class="pantalla">
+
+  <header class="cabecera">
+    <div class="izq">36 CONGRESO NACIONAL DE CIRUGÍA · CNC 2026</div>
+    <div class="der">TUMORES DESMOIDES INTRAABDOMINALES · CASOS CLÍNICOS</div>
+  </header>
+
+  <main class="cuerpo">
+    <div>
+      <p class="etiqueta" id="etiqueta">Sala abierta</p>
+      <h1 id="pregunta">Escanee el código y espere a la primera pregunta</h1>
+      <p class="contexto" id="contexto"></p>
+      <div class="barras" id="barras"></div>
+      <div class="respuesta oculto" id="respuesta">
+        <p class="clave" id="clave"></p>
+        <p class="detalle" id="detalle"></p>
+        <p class="refs" id="refs"></p>
+      </div>
+    </div>
+
+    <aside class="lateral">
+      <div class="qr"><img id="qr" src="assets/qr.png" alt="Código QR para votar"></div>
+      <div class="url" id="url"></div>
+      <div class="instruccion">Escanee con la cámara del móvil.<br>No hace falta instalar nada.</div>
+      <div class="contador"><span id="n">0</span><span>votos</span></div>
+    </aside>
+  </main>
+
+  <div class="mandos oculto" id="mandos">
+    <button data-ir="" id="b0">Sala</button>
+    <button data-ir="p1" id="b1">Caso 1</button>
+    <button data-ir="p2" id="b2">Caso 2</button>
+    <button data-ir="p3" id="b3">Caso 3</button>
+    <button id="revelar">Mostrar respuesta</button>
+    <span class="sep"></span>
+    <span class="estado" id="modo"></span>
+    <button id="reiniciar" class="peligro">Borrar votos de esta pregunta</button>
+  </div>
+
+  <div class="piecera">
+    <span>2 AL 5 DE NOVIEMBRE DE 2026 · MADRID</span>
+    <span>ASOCIACIÓN ESPAÑOLA DE CIRUGÍA</span>
+  </div>
+</div>
+
+<script type="module">
+import { PREGUNTAS } from "./preguntas.js";
+import { datos, contar } from "./datos.js";
+import { CONFIGURADO, CLAVE_CONTROL } from "./config.js";
+
+const $ = (id) => document.getElementById(id);
+const porId = Object.fromEntries(PREGUNTAS.map((p) => [p.id, p]));
+
+const params = new URLSearchParams(location.search);
+const mando = params.get("control") === CLAVE_CONTROL;
+
+const urlVoto = location.href.replace(/presentador\.html.*$/, "");
+$("url").textContent = urlVoto.replace(/^https?:\/\//, "").replace(/\/$/, "");
+
+let estado = { pregunta: null, revelada: false };
+let votos = {};
+let pintada = null;
+
+function montar(p) {
+  const cont = $("barras");
+  cont.innerHTML = "";
+  p.opciones.forEach((o) => {
+    const fila = document.createElement("div");
+    fila.className = "fila";
+    fila.dataset.opcion = o.id;
+    fila.innerHTML =
+      '<div class="letra">' + o.id + "</div>" +
+      '<div class="pista"><div class="relleno"></div><div class="texto"></div></div>' +
+      '<div class="pct">0%</div>';
+    fila.querySelector(".texto").textContent = o.texto;
+    cont.appendChild(fila);
+  });
+  pintada = p.id;
+}
+
+function pintar() {
+  const p = estado.pregunta ? porId[estado.pregunta] : null;
+
+  if (!p) {
+    pintada = null;
+    $("etiqueta").textContent = "Sala abierta";
+    $("pregunta").textContent = "Escanee el código y espere a la primera pregunta";
+    $("contexto").textContent = "";
+    $("barras").innerHTML = "";
+    $("respuesta").classList.add("oculto");
+    $("n").textContent = "0";
+    marcarMandos();
+    return;
+  }
+
+  if (pintada !== p.id) montar(p);
+
+  $("etiqueta").textContent = p.etiqueta;
+  $("pregunta").textContent = p.pregunta;
+  $("contexto").textContent = p.enunciado;
+
+  const conteo = contar(votos[p.id], p.opciones);
+  const total = conteo.total;
+  $("n").textContent = String(total);
+
+  document.querySelectorAll(".fila").forEach((fila) => {
+    const id = fila.dataset.opcion;
+    const n = conteo[id] || 0;
+    const pct = total ? Math.round((n / total) * 100) : 0;
+    fila.querySelector(".relleno").style.width = pct + "%";
+    fila.querySelector(".pct").textContent = estado.revelada || total ? pct + "%" : "";
+    fila.classList.toggle("es-correcta", estado.revelada && id === p.correcta);
+    fila.classList.toggle("atenuada", estado.revelada && id !== p.correcta);
+  });
+
+  const r = $("respuesta");
+  if (estado.revelada) {
+    $("clave").textContent = "Respuesta " + p.correcta + ". " + p.clave;
+    $("detalle").textContent = p.explicacion;
+    $("refs").textContent = p.referencias;
+    r.classList.remove("oculto");
+  } else {
+    r.classList.add("oculto");
+  }
+
+  marcarMandos();
+}
+
+function marcarMandos() {
+  if (!mando) return;
+  [["", "b0"], ["p1", "b1"], ["p2", "b2"], ["p3", "b3"]].forEach(([v, id]) => {
+    $(id).classList.toggle("activo", (estado.pregunta || "") === v);
+  });
+  $("revelar").textContent = estado.revelada ? "Ocultar respuesta" : "Mostrar respuesta";
+  $("revelar").classList.toggle("activo", !!estado.revelada);
+}
+
+if (mando) {
+  $("mandos").classList.remove("oculto");
+  $("modo").textContent = CONFIGURADO
+    ? "Sala en línea (Firebase)"
+    : "MODO ENSAYO — sin Firebase, los votos no salen de este navegador";
+  document.querySelectorAll("[data-ir]").forEach((b) => {
+    b.addEventListener("click", () =>
+      datos.fijarEstado({ pregunta: b.dataset.ir || null, revelada: false })
+    );
+  });
+  $("revelar").addEventListener("click", () =>
+    datos.fijarEstado({ revelada: !estado.revelada })
+  );
+  $("reiniciar").addEventListener("click", () => {
+    if (!estado.pregunta) return;
+    if (confirm("¿Borrar todos los votos de " + estado.pregunta + "?")) datos.reiniciar(estado.pregunta);
+  });
+  addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT") return;
+    const mapa = { "0": null, "1": "p1", "2": "p2", "3": "p3" };
+    if (e.key in mapa) datos.fijarEstado({ pregunta: mapa[e.key], revelada: false });
+    if (e.key === "r" || e.key === "R") datos.fijarEstado({ revelada: !estado.revelada });
+  });
+}
+
+datos.conectar().then(() => {
+  datos.escucharEstado((e) => { estado = e; pintar(); });
+  datos.escucharVotos((v) => { votos = v; pintar(); });
+}).catch((err) => {
+  $("pregunta").textContent = "No se ha podido conectar: " + (err && err.message ? err.message : "");
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1924">
+<title>Vota · Tumores desmoides intraabdominales · CNC 2026</title>
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<div class="banda">
+  <span class="marca">CNC 2026 · CASOS CLÍNICOS</span>
+  <span class="lema">Tumores desmoides intraabdominales</span>
+</div>
+
+<div id="aviso" class="aviso oculto"></div>
+
+<main class="movil">
+  <div id="espera" class="espera">
+    <p style="font-size:17px;font-weight:600;color:#0b1924;margin-bottom:6px">Conectado a la sala</p>
+    <p style="margin:0 0 18px">Esperando a que empiece la primera pregunta</p>
+    <span class="punto"></span><span class="punto"></span><span class="punto"></span>
+  </div>
+
+  <section id="bloque" class="oculto">
+    <p class="etiqueta" id="etiqueta"></p>
+    <p class="vineta" id="vineta"></p>
+    <p class="pregunta" id="pregunta"></p>
+    <div class="opciones" id="opciones"></div>
+    <div id="confirmado" class="confirmado oculto"></div>
+    <button id="cambiar" class="cambiar oculto">Cambiar mi respuesta</button>
+  </section>
+
+  <p class="pie">
+    Votación anónima. No se recoge ningún dato personal: solo un identificador aleatorio
+    guardado en este navegador para que no se cuente dos veces el mismo voto.
+  </p>
+</main>
+
+<script type="module">
+import { PREGUNTAS } from "./preguntas.js";
+import { datos, contar, idCliente } from "./datos.js";
+import { CONFIGURADO } from "./config.js";
+
+const $ = (id) => document.getElementById(id);
+const porId = Object.fromEntries(PREGUNTAS.map((p) => [p.id, p]));
+
+let estado = { pregunta: null, revelada: false };
+let votos = {};
+let pintada = null;      // id de la pregunta ya montada en el DOM
+let miVoto = null;
+let editando = false;
+
+function avisoLocal() {
+  if (CONFIGURADO) return;
+  const a = $("aviso");
+  a.classList.remove("oculto");
+  a.innerHTML = "<strong>Modo ensayo.</strong> No hay Firebase configurado en <code>config.js</code>, " +
+    "así que los votos solo se comparten entre pestañas de este mismo navegador. " +
+    "Para la charla real, completa <code>config.js</code> (ver README).";
+}
+
+function montar(p) {
+  $("etiqueta").textContent = p.etiqueta;
+  $("vineta").textContent = p.enunciado;
+  $("pregunta").textContent = p.pregunta;
+  const cont = $("opciones");
+  cont.innerHTML = "";
+  p.opciones.forEach((o) => {
+    const b = document.createElement("button");
+    b.className = "opcion";
+    b.type = "button";
+    b.dataset.opcion = o.id;
+    b.setAttribute("aria-pressed", "false");
+    const l = document.createElement("span");
+    l.className = "letra";
+    l.textContent = o.id;
+    const t = document.createElement("span");
+    t.textContent = o.texto;
+    b.append(l, t);
+    b.addEventListener("click", () => {
+      if (b.disabled) return;
+      miVoto = o.id;
+      editando = false;
+      datos.votar(p.id, o.id);
+      pintar();
+    });
+    cont.appendChild(b);
+  });
+  pintada = p.id;
+}
+
+function pintar() {
+  const p = estado.pregunta ? porId[estado.pregunta] : null;
+  if (!p) {
+    $("espera").classList.remove("oculto");
+    $("bloque").classList.add("oculto");
+    return;
+  }
+  $("espera").classList.add("oculto");
+  $("bloque").classList.remove("oculto");
+
+  if (pintada !== p.id) {
+    montar(p);
+    miVoto = (votos[p.id] || {})[idCliente()] || null;
+    editando = false;
+  }
+
+  const conteo = contar(votos[p.id], p.opciones);
+  const yaVote = miVoto !== null;
+  const bloqueado = (yaVote && !editando) || estado.revelada;
+
+  document.querySelectorAll("button.opcion").forEach((b) => {
+    const id = b.dataset.opcion;
+    b.setAttribute("aria-pressed", String(id === miVoto));
+    b.disabled = bloqueado;
+    b.classList.toggle("correcta", estado.revelada && id === p.correcta);
+    b.classList.toggle("fallida", estado.revelada && id !== p.correcta);
+  });
+
+  const conf = $("confirmado");
+  const cambiar = $("cambiar");
+  if (estado.revelada) {
+    conf.classList.remove("oculto");
+    const acierto = miVoto === p.correcta;
+    conf.innerHTML =
+      "<strong>Respuesta correcta: " + p.correcta + "</strong><br>" +
+      (yaVote ? (acierto ? "Tu respuesta era correcta." : "Tu respuesta fue " + miVoto + ".") + "<br>" : "") +
+      p.clave;
+    cambiar.classList.add("oculto");
+  } else if (yaVote && !editando) {
+    conf.classList.remove("oculto");
+    conf.textContent =
+      "Voto registrado (" + miVoto + "). " + conteo.total +
+      (conteo.total === 1 ? " voto" : " votos") + " en la sala.";
+    cambiar.classList.remove("oculto");
+  } else {
+    conf.classList.add("oculto");
+    cambiar.classList.add("oculto");
+  }
+}
+
+$("cambiar").addEventListener("click", () => { editando = true; pintar(); });
+
+avisoLocal();
+idCliente();
+
+datos.conectar().then(() => {
+  datos.escucharEstado((e) => { estado = e; pintar(); });
+  datos.escucharVotos((v) => { votos = v; pintar(); });
+}).catch((err) => {
+  const a = $("aviso");
+  a.classList.remove("oculto");
+  a.innerHTML = "<strong>No se ha podido conectar.</strong> " + (err && err.message ? err.message : "");
+});
+</script>
+</body>
+</html>
