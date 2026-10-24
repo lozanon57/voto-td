@@ -15,22 +15,42 @@
 </div>
 
 <div id="aviso" class="aviso oculto"></div>
+<div id="bannerDemo" class="banner-demo oculto">
+  MODO DE PRUEBA — su voto no cuenta para la sala
+  <button id="salirDemo">salir</button>
+</div>
 
 <main class="movil">
+
+  <!-- Sala abierta, sin pregunta activa -->
   <div id="espera" class="espera">
-    <p style="font-size:17px;font-weight:600;color:#0b1924;margin-bottom:6px">Ya está dentro</p>
-    <p style="margin:0 0 18px">Esperando a que empiece la primera pregunta</p>
+    <p class="espera-titulo">Ya está dentro</p>
+    <p class="espera-sub">Esperando a que el ponente lance la primera pregunta</p>
     <span class="punto"></span><span class="punto"></span><span class="punto"></span>
     <p class="conexion" id="conexion">Conectando…</p>
+
+    <div id="ayuda" class="ayuda oculto">
+      <p>Las preguntas las abre el ponente una a una desde su pantalla. Mientras no
+         lance ninguna, aquí no hay nada que votar: es normal.</p>
+      <button id="verDemo" class="boton">Ver cómo funciona</button>
+      <a class="enlace-ponente" href="presentador.html">Soy el ponente · abrir mis mandos</a>
+    </div>
   </div>
 
+  <!-- Pregunta activa -->
   <section id="bloque" class="oculto">
     <p class="etiqueta" id="etiqueta"></p>
     <p class="vineta" id="vineta"></p>
     <p class="pregunta" id="pregunta"></p>
     <div class="opciones" id="opciones"></div>
     <div id="confirmado" class="confirmado oculto"></div>
+    <div id="resultado" class="resultado oculto"></div>
+    <div id="explicacion" class="explicacion oculto"></div>
     <button id="cambiar" class="cambiar oculto">Cambiar mi respuesta</button>
+    <div id="navDemo" class="nav-demo oculto">
+      <button id="demoAnterior" class="boton secundario">◀ Anterior</button>
+      <button id="demoSiguiente" class="boton secundario">Siguiente ▶</button>
+    </div>
   </section>
 
   <p class="pie">
@@ -45,12 +65,25 @@ import { datos, contar, idCliente } from "./datos.js";
 
 const $ = (id) => document.getElementById(id);
 const porId = Object.fromEntries(PREGUNTAS.map((p) => [p.id, p]));
+const orden = PREGUNTAS.map((p) => p.id);
 
 let estado = { pregunta: null, revelada: false };
 let votos = {};
-let pintada = null;      // id de la pregunta ya montada en el DOM
+let pintada = null;
 let miVoto = null;
 let editando = false;
+
+// Modo de prueba: todo ocurre dentro de este navegador y no toca la sala.
+let demo = false;
+let demoIndice = 0;
+let demoVoto = null;
+let demoRevelada = false;
+
+const activa = () => (demo ? porId[orden[demoIndice]]
+                           : (estado.pregunta ? porId[estado.pregunta] : null));
+const revelada = () => (demo ? demoRevelada : estado.revelada);
+
+// --------------------------------------------------------------- conexión --
 
 function pintarConexion(res) {
   const cx = $("conexion");
@@ -65,10 +98,12 @@ function avisarSiAislado(res) {
   if (!res || res.modo !== "local") return;
   const a = $("aviso");
   a.classList.remove("oculto");
-  a.innerHTML = "<strong>Sin conexión con la sala.</strong> No se ha podido alcanzar ningún " +
-    "servidor, así que su voto no llegará al recuento. Compruebe la conexión a internet " +
+  a.innerHTML = "<strong>Sin conexión con la sala.</strong> No se ha podido alcanzar " +
+    "ningún servidor, así que su voto no llegaría al recuento. Compruebe la conexión " +
     "y vuelva a cargar la página.";
 }
+
+// ------------------------------------------------------------------ vista --
 
 function montar(p) {
   $("etiqueta").textContent = p.etiqueta;
@@ -90,18 +125,48 @@ function montar(p) {
     b.append(l, t);
     b.addEventListener("click", () => {
       if (b.disabled) return;
-      miVoto = o.id;
-      editando = false;
-      datos.votar(p.id, o.id);
+      if (demo) {
+        demoVoto = o.id;
+        demoRevelada = true;          // en prueba la respuesta sale al momento
+      } else {
+        miVoto = o.id;
+        editando = false;
+        datos.votar(p.id, o.id);
+      }
       pintar();
     });
     cont.appendChild(b);
   });
-  pintada = p.id;
+  pintada = (demo ? "demo:" : "") + p.id;
+}
+
+function pintarBarras(p) {
+  const caja = $("resultado");
+  if (demo) { caja.classList.add("oculto"); return; }
+  const conteo = contar(votos[p.id], p.opciones);
+  if (!conteo.total) { caja.classList.add("oculto"); return; }
+  caja.classList.remove("oculto");
+  caja.innerHTML = "";
+  const cab = document.createElement("p");
+  cab.className = "resultado-cab";
+  cab.textContent = conteo.total === 1 ? "1 voto en la sala" : conteo.total + " votos en la sala";
+  caja.appendChild(cab);
+  p.opciones.forEach((o) => {
+    const n = conteo[o.id] || 0;
+    const pct = Math.round((n / conteo.total) * 100);
+    const fila = document.createElement("div");
+    fila.className = "mini" + (estado.revelada && o.id === p.correcta ? " acierto" : "");
+    fila.innerHTML = '<span class="mini-letra">' + o.id + "</span>" +
+                     '<span class="mini-pista"><span class="mini-relleno"></span></span>' +
+                     '<span class="mini-pct">' + pct + "%</span>";
+    fila.querySelector(".mini-relleno").style.width = pct + "%";
+    caja.appendChild(fila);
+  });
 }
 
 function pintar() {
-  const p = estado.pregunta ? porId[estado.pregunta] : null;
+  const p = activa();
+
   if (!p) {
     $("espera").classList.remove("oculto");
     $("bloque").classList.add("oculto");
@@ -110,47 +175,85 @@ function pintar() {
   $("espera").classList.add("oculto");
   $("bloque").classList.remove("oculto");
 
-  if (pintada !== p.id) {
+  const clave = (demo ? "demo:" : "") + p.id;
+  if (pintada !== clave) {
     montar(p);
-    miVoto = (votos[p.id] || {})[idCliente()] || null;
-    editando = false;
+    if (!demo) { miVoto = (votos[p.id] || {})[idCliente()] || null; editando = false; }
   }
 
-  const conteo = contar(votos[p.id], p.opciones);
-  const yaVote = miVoto !== null;
-  const bloqueado = (yaVote && !editando) || estado.revelada;
+  const voto = demo ? demoVoto : miVoto;
+  const yaVote = voto !== null;
+  const bloqueado = (yaVote && !editando) || revelada();
 
   document.querySelectorAll("button.opcion").forEach((b) => {
     const id = b.dataset.opcion;
-    b.setAttribute("aria-pressed", String(id === miVoto));
+    b.setAttribute("aria-pressed", String(id === voto));
     b.disabled = bloqueado;
-    b.classList.toggle("correcta", estado.revelada && id === p.correcta);
-    b.classList.toggle("fallida", estado.revelada && id !== p.correcta);
+    b.classList.toggle("correcta", revelada() && id === p.correcta);
+    b.classList.toggle("fallida", revelada() && id !== p.correcta);
   });
 
   const conf = $("confirmado");
+  const expl = $("explicacion");
   const cambiar = $("cambiar");
-  if (estado.revelada) {
+
+  if (revelada()) {
     conf.classList.remove("oculto");
-    const acierto = miVoto === p.correcta;
-    conf.innerHTML =
-      "<strong>Respuesta correcta: " + p.correcta + "</strong><br>" +
-      (yaVote ? (acierto ? "Tu respuesta era correcta." : "Tu respuesta fue " + miVoto + ".") + "<br>" : "") +
-      p.clave;
+    conf.innerHTML = "<strong>Respuesta correcta: " + p.correcta + "</strong>" +
+      (yaVote ? "<br>" + (voto === p.correcta ? "Su respuesta era correcta."
+                                              : "Usted respondió " + voto + ".") : "");
+    expl.classList.remove("oculto");
+    expl.innerHTML = "<p class='clave'></p><p class='detalle'></p><p class='refs'></p>";
+    expl.querySelector(".clave").textContent = p.clave;
+    expl.querySelector(".detalle").textContent = p.explicacion;
+    expl.querySelector(".refs").textContent = p.referencias;
     cambiar.classList.add("oculto");
-  } else if (yaVote && !editando) {
-    conf.classList.remove("oculto");
-    conf.textContent =
-      "Voto registrado (" + miVoto + "). " + conteo.total +
-      (conteo.total === 1 ? " voto" : " votos") + " en la sala.";
-    cambiar.classList.remove("oculto");
   } else {
-    conf.classList.add("oculto");
-    cambiar.classList.add("oculto");
+    expl.classList.add("oculto");
+    if (yaVote && !editando) {
+      conf.classList.remove("oculto");
+      conf.textContent = "Voto registrado (" + voto + ").";
+      cambiar.classList.remove("oculto");
+    } else {
+      conf.classList.add("oculto");
+      cambiar.classList.add("oculto");
+    }
   }
+
+  if (!demo) pintarBarras(p); else $("resultado").classList.add("oculto");
+  $("navDemo").classList.toggle("oculto", !demo);
 }
 
 $("cambiar").addEventListener("click", () => { editando = true; pintar(); });
+
+// ------------------------------------------------------------ modo prueba --
+
+function entrarDemo() {
+  demo = true; demoIndice = 0; demoVoto = null; demoRevelada = false; pintada = null;
+  $("bannerDemo").classList.remove("oculto");
+  pintar();
+  scrollTo(0, 0);
+}
+function salirDemo() {
+  demo = false; pintada = null;
+  $("bannerDemo").classList.add("oculto");
+  pintar();
+}
+function demoSaltar(paso) {
+  demoIndice = Math.min(orden.length - 1, Math.max(0, demoIndice + paso));
+  demoVoto = null; demoRevelada = false; pintada = null;
+  pintar();
+  scrollTo(0, 0);
+}
+$("verDemo").addEventListener("click", entrarDemo);
+$("salirDemo").addEventListener("click", salirDemo);
+$("demoAnterior").addEventListener("click", () => demoSaltar(-1));
+$("demoSiguiente").addEventListener("click", () => demoSaltar(1));
+
+// Si a los tres segundos no hay pregunta, se explica por qué y se ofrece salida.
+setTimeout(() => {
+  if (!activa()) $("ayuda").classList.remove("oculto");
+}, 3000);
 
 idCliente();
 
@@ -162,6 +265,7 @@ datos.conectar().then((res) => {
   const a = $("aviso");
   a.classList.remove("oculto");
   a.innerHTML = "<strong>No se ha podido conectar.</strong> " + (err && err.message ? err.message : "");
+  $("ayuda").classList.remove("oculto");
 });
 </script>
 </body>

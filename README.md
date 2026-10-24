@@ -16,15 +16,23 @@ audiencia necesitáis cuenta, registro ni instalar nada.
 
 ## 1 · Cómo se usa el día de la charla
 
+> **Lo primero, porque es lo que más despista:** las preguntas se lanzan una a
+> una desde la vista de ponente. Quien escanee el QR sin que tú hayas abierto
+> ninguna verá una pantalla de espera. Es normal, no es un fallo — pero sin esa
+> ventana abierta no hay votación.
+
 **Antes de empezar**
 
 1. Abre en una segunda ventana o segunda pantalla
-   `presentador.html?control=maranon` y ponla en pantalla completa
-   (`F11`, o `Ctrl/Cmd + Mayús + F` en Safari).
-2. Comprueba abajo a la derecha que pone **«Sala en línea · broker…»**. Si
-   pusiera «Sin red», recarga.
+   `presentador.html` y ponla en pantalla completa (`F11`, o
+   `Ctrl/Cmd + Mayús + F` en Safari). Los mandos salen solos.
+2. Comprueba abajo a la derecha que pone **«Sala en línea · 3/3 servidores»**.
 3. Pulsa **Sala**: queda el QR grande esperando. Esa pantalla se puede proyectar
    mientras entra la gente.
+
+¿Sin segunda pantalla? La vista de ponente funciona también **en el móvil**:
+ábrela en el teléfono y ve pasando preguntas desde la mano, con el PowerPoint a
+pantalla completa en el portátil.
 
 **Durante cada caso**
 
@@ -32,7 +40,7 @@ audiencia necesitáis cuenta, registro ni instalar nada.
 |---|---|
 | Presentas el caso | Diapositivas de PowerPoint |
 | Lanzas la pregunta | Cambias a la ventana del presentador y pulsas **▶** (o la flecha derecha) |
-| La sala vota | Las barras crecen solas; el contador de votos sube |
+| La sala vota | Las barras crecen solas, en tu pantalla **y en el móvil de cada asistente** |
 | Cierras la votación | Pulsas **Mostrar respuesta** (tecla `R`): la correcta se pone verde, el resto se atenúa y aparece la explicación con las referencias |
 | Sigues | Vuelves a PowerPoint |
 
@@ -43,6 +51,17 @@ a cualquier pregunta directamente.
 
 **Si el wifi falla**: las diapositivas de pregunta del PowerPoint llevan las
 mismas opciones impresas. Pide voto a mano alzada y sigue.
+
+## 1 bis · Probarlo tú solo, sin montar nada
+
+En la página del móvil, si no hay ninguna pregunta abierta aparece a los tres
+segundos un botón **«Ver cómo funciona»**: recorre las doce preguntas en ese
+teléfono, con su respuesta y su explicación, sin tocar la sala y sin contar
+votos. Es la forma rápida de enseñárselo a alguien o de repasar el contenido.
+
+Para probar el circuito completo (voto → barras en vivo → respuesta) necesitas
+dos pantallas, aunque sea el portátil y el móvil: abre `presentador.html` en una
+y la página de voto en la otra.
 
 **Ensayo general**: cambia `SALA` en `config.js` a `"cnc2026-ensayo"`, ensaya con
 el móvil y devuélvelo a `"cnc2026"` antes de la charla. Así llegas al congreso
