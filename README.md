@@ -6,8 +6,8 @@ crecer en tiempo real en la vista de presentador, con el mismo aspecto que las
 diapositivas del congreso.
 
 - **Público (móvil):** https://lozanon57.github.io/voto-td/
-- **Presentador (proyección):** https://lozanon57.github.io/voto-td/presentador.html
-- **Presentador con mandos:** https://lozanon57.github.io/voto-td/presentador.html?control=maranon
+- **Presentador (con mandos):** https://lozanon57.github.io/voto-td/presentador.html
+- **Presentador sin botones**, para proyectar: añade `?publico=1`
 
 **Está listo para la sala tal cual: no hay nada que configurar.** Ni tú ni la
 audiencia necesitáis cuenta, registro ni instalar nada.
@@ -31,13 +31,15 @@ audiencia necesitáis cuenta, registro ni instalar nada.
 | Momento | Qué haces |
 |---|---|
 | Presentas el caso | Diapositivas de PowerPoint |
-| Lanzas la pregunta | Cambias a la ventana del presentador y pulsas **Caso 1** (o la tecla `1`) |
+| Lanzas la pregunta | Cambias a la ventana del presentador y pulsas **▶** (o la flecha derecha) |
 | La sala vota | Las barras crecen solas; el contador de votos sube |
 | Cierras la votación | Pulsas **Mostrar respuesta** (tecla `R`): la correcta se pone verde, el resto se atenúa y aparece la explicación con las referencias |
 | Sigues | Vuelves a PowerPoint |
 
-Atajos en la vista de presentador: `1` `2` `3` saltan a cada caso, `0` vuelve a
-la pantalla de sala, `R` muestra u oculta la respuesta.
+Atajos en la vista de presentador: **flecha derecha** avanza a la pregunta
+siguiente, **flecha izquierda** retrocede, **0** o **Esc** vuelven a la pantalla
+de sala, **R** muestra u oculta la respuesta. Los doce botones numerados saltan
+a cualquier pregunta directamente.
 
 **Si el wifi falla**: las diapositivas de pregunta del PowerPoint llevan las
 mismas opciones impresas. Pide voto a mano alzada y sigue.
@@ -51,20 +53,30 @@ esta pregunta** en cada uno de los tres casos antes de empezar.
 
 ## 2 · Cómo funciona por dentro
 
-Los tres dispositivos —tu portátil y los móviles de la sala— se sincronizan por
-**MQTT sobre WebSocket** contra brókeres públicos, usando **mensajes retenidos**.
-Eso significa que quien abre la página tarde recibe inmediatamente la pregunta
-activa y el recuento completo, sin necesidad de servidor propio ni base de datos.
+Tu portátil y los móviles de la sala se sincronizan por **MQTT sobre WebSocket**
+contra brókeres públicos, usando **mensajes retenidos**: quien abre la página
+tarde recibe al instante la pregunta activa y el recuento completo, sin servidor
+propio ni base de datos.
 
-Si el primer bróker no responde en siete segundos, la aplicación salta sola al
-siguiente de la lista de `config.js`:
+Cada dispositivo se conecta a **todos** los brókeres de la lista a la vez, no a
+uno solo. Esto es deliberado y corrige el fallo que tenía la primera versión: si
+cada dispositivo elegía bróker por su cuenta, el portátil podía acabar en uno y
+los móviles en otro, y eran dos salas distintas que no se veían. Publicando en
+todos, basta con que cada móvil comparta **un** bróker con el presentador.
+
+Además, un bróker que no responde al arrancar no se abandona: sigue reintentando
+de fondo y, en cuanto entra, se le reenvía el estado y los votos propios. Una
+sala que empieza con 2 de 3 servidores se repara sola. El indicador de la esquina
+inferior derecha dice en todo momento cuántos hay conectados.
+
+La lista, en `config.js`:
 
 1. `wss://broker.hivemq.com:8884/mqtt`
 2. `wss://broker.emqx.io:8084/mqtt`
 3. `wss://test.mosquitto.org:8081/mqtt`
 
 Si no hay ninguno alcanzable, cada navegador queda aislado y la página del móvil
-lo avisa claramente, para que nadie crea que ha votado cuando no es así.
+lo avisa en rojo, para que nadie crea que ha votado cuando no es así.
 
 La librería MQTT va **vendorizada** en `assets/mqtt.min.js`: no se descarga nada
 de ningún CDN en tiempo de ejecución.
@@ -124,7 +136,7 @@ cambia sola de transporte en cuanto rellenes `FIREBASE` en `config.js`:
 |---|---|
 | `index.html` | Página de voto que ve el público en el móvil |
 | `presentador.html` | Vista de proyección: QR, barras en vivo, mandos |
-| `preguntas.js` | **Las tres preguntas, sus opciones, la respuesta correcta y la explicación.** Es el único archivo que necesitas tocar para cambiar contenido |
+| `preguntas.js` | Las doce preguntas. **Generado automáticamente**: no se edita a mano (ver abajo) |
 | `config.js` | Sala, tópico, lista de brókeres, clave de los mandos y (opcional) Firebase |
 | `datos.js` | Sincronización: Firebase → MQTT → local, en ese orden |
 | `estilo.css` | Aspecto |
@@ -133,24 +145,24 @@ cambia sola de transporte en cuanto rellenes `FIREBASE` en `config.js`:
 
 ### Cambiar las preguntas
 
-Todo está en `preguntas.js`. Cada pregunta lleva:
+`preguntas.js` **se genera**, no se edita. La fuente única es
 
-```js
-{
-  id: "p1",                 // no lo cambies: lo usan los mandos y las teclas 1/2/3
-  etiqueta: "Caso 1 · ...", // rótulo pequeño de arriba
-  enunciado: "...",         // viñeta clínica
-  pregunta: "...",          // la pregunta en sí
-  opciones: [ { id: "A", texto: "..." }, ... ],   // 2 a 6 opciones
-  correcta: "C",
-  clave: "...",             // una frase: la idea que debe quedar
-  explicacion: "...",       // el párrafo razonado
-  referencias: "...",
-}
+```
+.../CNC desmoides/build/preguntas.py
 ```
 
-Si añades un cuarto caso, duplica un bloque con `id: "p4"`, añade un botón
-`data-ir="p4"` en `presentador.html` y amplía el mapa de teclas.
+que está junto a la presentación. Al editarlo y ejecutar
+
+```bash
+python3 "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Desmoides ASO MSKCC/CNC desmoides/build/construir.py"
+```
+
+se reconstruyen a la vez el PowerPoint y este `preguntas.js`, de modo que las
+diapositivas y los móviles no puedan decir cosas distintas. Después, `git commit`
+y `git push`.
+
+Los mandos del presentador y los atajos de teclado se generan a partir del número
+de preguntas: si añades o quitas alguna, no hay que tocar el HTML.
 
 Para regenerar el QR si cambias la URL:
 

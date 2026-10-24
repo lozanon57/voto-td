@@ -294,3 +294,25 @@ button.opcion.fallida { opacity: .5; }
   display: flex;
   justify-content: space-between;
 }
+
+/* indicador de conexión */
+.conexion {
+  font-size: 11px;
+  letter-spacing: .04em;
+  color: var(--grey);
+  margin: 10px 0 0;
+}
+.conexion.bien { color: var(--green); }
+.conexion.regular { color: #c77700; }
+.conexion.mal { color: #b3261e; font-weight: 700; }
+.lateral .conexion { margin-top: 4px; }
+
+/* fila de números de pregunta en los mandos */
+.numeros { display: flex; gap: 4px; flex-wrap: wrap; }
+.numeros button {
+  min-width: 30px;
+  padding: 7px 6px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.mandos button[title] { white-space: nowrap; }

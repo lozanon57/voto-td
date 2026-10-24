@@ -1,15 +1,15 @@
-// Capa de datos. Tres implementaciones con la misma interfaz, elegidas en este
-// orden:
+// Capa de datos. Tres implementaciones con la misma interfaz:
 //
-//   1. Firebase Realtime Database — si config.js está relleno. Es la opción más
-//      robusta, pero exige crear un proyecto con una cuenta de Google.
-//   2. MQTT sobre WebSocket contra brókeres públicos — sin cuentas, sin
-//      configuración y con mensajes retenidos, de modo que quien entra tarde
-//      recibe el estado y el recuento completos. Es lo que funciona por defecto.
-//   3. Local (localStorage + BroadcastChannel) — último recurso si no hay red:
-//      los votos solo se comparten entre pestañas del mismo navegador.
+//   1. Firebase Realtime Database — si config.js está relleno.
+//   2. MQTT sobre WebSocket contra brókeres públicos. Se conecta a TODOS los
+//      brókeres de la lista a la vez y publica en todos ellos. Esto es
+//      deliberado: si cada dispositivo eligiera un bróker por su cuenta, el
+//      portátil podría acabar en uno y los móviles en otro, y serían dos salas
+//      distintas que no se ven. Publicando en todos, basta con que cada móvil
+//      comparta UN bróker con el presentador.
+//   3. Local (localStorage + BroadcastChannel) — si no hay ninguno alcanzable.
 //
-// Interfaz expuesta:
+// Interfaz:
 //   conectar()                        -> { modo, detalle }
 //   escucharEstado(fn)                -> fn({ pregunta, revelada })
 //   escucharVotos(fn)                 -> fn({ p1: {cliente: "C", ...}, ... })
@@ -21,7 +21,8 @@
 import { FIREBASE, SALA, CONFIGURADO, BROKERS, ESPACIO } from "./config.js";
 
 const CLAVE_CLIENTE = "cnc2026:cliente";
-const ESTADO_INICIAL = { pregunta: null, revelada: false };
+const ESTADO_INICIAL = { pregunta: null, revelada: false, ts: 0 };
+const PLAZO_CONEXION = 9000;
 
 export function idCliente() {
   let id = localStorage.getItem(CLAVE_CLIENTE);
@@ -50,8 +51,7 @@ function difusor() {
 // --------------------------------------------------------------------------
 
 function crearFirebase() {
-  let db = null;
-  let fb = null;
+  let db = null, fb = null;
   return {
     modo: "firebase",
     async conectar() {
@@ -63,9 +63,7 @@ function crearFirebase() {
     escucharEstado(fn) {
       fb.onValue(fb.ref(db, `${SALA}/estado`), (s) => fn({ ...ESTADO_INICIAL, ...(s.val() || {}) }));
     },
-    escucharVotos(fn) {
-      fb.onValue(fb.ref(db, `${SALA}/votos`), (s) => fn(s.val() || {}));
-    },
+    escucharVotos(fn) { fb.onValue(fb.ref(db, `${SALA}/votos`), (s) => fn(s.val() || {})); },
     async fijarEstado(parcial) {
       await fb.update(fb.ref(db, `${SALA}/estado`), { ...parcial, ts: Date.now() });
     },
@@ -79,7 +77,7 @@ function crearFirebase() {
 }
 
 // --------------------------------------------------------------------------
-// 2 · MQTT sobre WebSocket (brókeres públicos, sin cuenta)
+// 2 · MQTT sobre WebSocket, en todos los brókeres a la vez
 // --------------------------------------------------------------------------
 
 function cargarMqtt() {
@@ -96,13 +94,30 @@ function cargarMqtt() {
 function crearMqtt() {
   const d = difusor();
   const RAIZ = `${ESPACIO}/${SALA}`;
-  let cliente = null;
-  let respaldo = null;   // implementación local si no hay bróker alcanzable
+  const clientes = [];          // los que están conectados AHORA
+  const todos = [];             // todos, conectados o reintentando
+  let respaldo = null;
+  let avisarConexion = null;
+  let esPonente = false;        // solo el presentador publica el estado
+  const misVotos = {};          // para reenviarlos si entra un bróker tarde
 
+  const resumen = () => ({
+    modo: respaldo ? "local" : "mqtt",
+    conectados: clientes.length,
+    total: BROKERS.length,
+    detalle: respaldo
+      ? "Sin conexión con la sala"
+      : `Sala en línea · ${clientes.length}/${BROKERS.length} servidores`,
+  });
+
+  const notificar = () => { if (avisarConexion) avisarConexion(resumen()); };
+
+  const publicarEn = (c, topico, carga) => {
+    if (c.connected) c.publish(topico, carga, { qos: 0, retain: true });
+  };
   const publicar = (topico, carga) => {
     if (respaldo) return;
-    if (!cliente || !cliente.connected) return;
-    cliente.publish(topico, carga, { qos: 0, retain: true });
+    clientes.forEach((c) => publicarEn(c, topico, carga));
   };
 
   function aplicar(topico, texto) {
@@ -110,81 +125,102 @@ function crearMqtt() {
     const resto = topico.slice(RAIZ.length + 1).split("/");
 
     if (resto[0] === "estado") {
-      if (!texto) { d.estado = { ...ESTADO_INICIAL }; } else {
-        try { d.estado = { ...ESTADO_INICIAL, ...JSON.parse(texto) }; } catch { return; }
-      }
+      if (!texto) return;
+      let nuevo;
+      try { nuevo = JSON.parse(texto); } catch { return; }
+      // El mismo mensaje llega por varios brókeres, y uno que estuvo caído puede
+      // traer un retenido viejo: solo avanzamos en el tiempo, nunca al revés.
+      if ((nuevo.ts || 0) < (d.estado.ts || 0)) return;
+      d.estado = { ...ESTADO_INICIAL, ...nuevo };
       d.emitirEstado();
       return;
     }
     if (resto[0] === "votos" && resto.length === 3) {
       const [, preguntaId, cli] = resto;
       d.votos[preguntaId] = d.votos[preguntaId] || {};
+      const antes = d.votos[preguntaId][cli];
       if (texto) d.votos[preguntaId][cli] = texto;
       else delete d.votos[preguntaId][cli];
-      d.emitirVotos();
+      if (antes !== d.votos[preguntaId][cli]) d.emitirVotos();
     }
   }
 
-  function intentar(indice) {
-    return new Promise((res, rej) => {
-      if (indice >= BROKERS.length) return rej(new Error("ningún bróker alcanzable"));
-      const url = BROKERS[indice];
-      let resuelto = false;
-      const c = window.mqtt.connect(url, {
-        clientId: "td-" + idCliente() + "-" + Math.random().toString(16).slice(2, 6),
-        keepalive: 30,
-        clean: true,
-        protocolVersion: 4,
-        connectTimeout: 6000,
-        reconnectPeriod: 2500,
-      });
-      const rendirse = () => {
-        if (resuelto) return;
-        resuelto = true;
-        try { c.end(true); } catch { /* ignorar */ }
-        intentar(indice + 1).then(res, rej);
-      };
-      const plazo = setTimeout(rendirse, 7000);
-      c.on("error", rendirse);
-      c.on("connect", () => {
-        if (resuelto) return;
-        resuelto = true;
-        clearTimeout(plazo);
-        c.subscribe(RAIZ + "/#", { qos: 0 });
-        res({ c, url });
-      });
+  // Al entrar (o reentrar) un bróker, le reenviamos lo que es nuestro: así una
+  // sala que arrancó con 2 de 3 servidores se repara sola cuando llega el tercero.
+  function reenviarLoPropio(c) {
+    if (esPonente && d.estado.ts) {
+      publicarEn(c, RAIZ + "/estado", JSON.stringify(d.estado));
+    }
+    Object.entries(misVotos).forEach(([preguntaId, opcion]) => {
+      publicarEn(c, `${RAIZ}/votos/${preguntaId}/${idCliente()}`, opcion);
+    });
+  }
+
+  // No se abandona ningún bróker: el que falla sigue reintentando de fondo y se
+  // incorpora en cuanto responde.
+  function conectarA(url) {
+    return new Promise((res) => {
+      let primera = true;
+      let c;
+      try {
+        c = window.mqtt.connect(url, {
+          clientId: "td-" + idCliente() + "-" + Math.random().toString(16).slice(2, 6),
+          keepalive: 30,
+          clean: true,
+          protocolVersion: 4,
+          connectTimeout: PLAZO_CONEXION,
+          reconnectPeriod: 5000,
+        });
+      } catch { return res(null); }
+
+      c.url = url;
+      todos.push(c);
+      const plazo = setTimeout(() => {
+        if (primera) { primera = false; res(null); }
+      }, PLAZO_CONEXION + 1500);
+
+      c.on("error", () => { /* mqtt.js reintenta por su cuenta */ });
       c.on("message", (t, carga) => aplicar(t, carga.toString()));
+      c.on("close", () => {
+        const i = clientes.indexOf(c);
+        if (i >= 0) { clientes.splice(i, 1); notificar(); }
+      });
+      c.on("connect", () => {
+        c.subscribe(RAIZ + "/#", { qos: 0 });
+        if (!clientes.includes(c)) { clientes.push(c); notificar(); }
+        reenviarLoPropio(c);
+        if (primera) { primera = false; clearTimeout(plazo); res(c); }
+      });
     });
   }
 
   return {
     modo: "mqtt",
+    alCambiarConexion(fn) { avisarConexion = fn; },
     async conectar() {
       try {
         await cargarMqtt();
-        const { c, url } = await intentar(0);
-        cliente = c;
-        // Al reconectar hay que volver a suscribirse para recibir los retenidos.
-        c.on("connect", () => c.subscribe(RAIZ + "/#", { qos: 0 }));
-        const host = new URL(url).host;
-        return { modo: "mqtt", detalle: `Sala en línea · ${host}` };
-      } catch (e) {
+        await Promise.all(BROKERS.map(conectarA));
+      } catch { /* cae al respaldo */ }
+      if (!clientes.length && !todos.length) {
         respaldo = crearLocal();
         await respaldo.conectar();
-        return { modo: "local", detalle: "Sin red: votos solo en este navegador" };
       }
+      return resumen();
     },
     escucharEstado(fn) { respaldo ? respaldo.escucharEstado(fn) : d.onEstado(fn); },
     escucharVotos(fn) { respaldo ? respaldo.escucharVotos(fn) : d.onVotos(fn); },
     async fijarEstado(parcial) {
       if (respaldo) return respaldo.fijarEstado(parcial);
+      esPonente = true;
       const nuevo = { ...d.estado, ...parcial, ts: Date.now() };
       d.estado = nuevo;
-      d.emitirEstado();                       // respuesta inmediata en el mando
+      d.emitirEstado();
       publicar(RAIZ + "/estado", JSON.stringify(nuevo));
     },
     async votar(preguntaId, opcionId) {
       if (respaldo) return respaldo.votar(preguntaId, opcionId);
+      misVotos[preguntaId] = opcionId;
       d.votos[preguntaId] = d.votos[preguntaId] || {};
       d.votos[preguntaId][idCliente()] = opcionId;
       d.emitirVotos();
@@ -192,9 +228,10 @@ function crearMqtt() {
     },
     async reiniciar(preguntaId) {
       if (respaldo) return respaldo.reiniciar(preguntaId);
-      const ids = Object.keys(d.votos[preguntaId] || {});
-      // Un mensaje retenido se borra publicando una carga vacía en su tópico.
-      ids.forEach((cli) => publicar(`${RAIZ}/votos/${preguntaId}/${cli}`, ""));
+      Object.keys(d.votos[preguntaId] || {}).forEach((cli) =>
+        publicar(`${RAIZ}/votos/${preguntaId}/${cli}`, "")  // carga vacía = borra el retenido
+      );
+      delete misVotos[preguntaId];
       d.votos[preguntaId] = {};
       d.emitirVotos();
     },
@@ -202,7 +239,7 @@ function crearMqtt() {
 }
 
 // --------------------------------------------------------------------------
-// 3 · Local (ensayo sin red)
+// 3 · Local (sin red)
 // --------------------------------------------------------------------------
 
 function crearLocal() {
@@ -234,7 +271,7 @@ function crearLocal() {
     escucharEstado(fn) { oyentesEstado.push(fn); fn(leerEstado()); },
     escucharVotos(fn) { oyentesVotos.push(fn); fn(leerVotos()); },
     async fijarEstado(parcial) {
-      localStorage.setItem(kEstado, JSON.stringify({ ...leerEstado(), ...parcial }));
+      localStorage.setItem(kEstado, JSON.stringify({ ...leerEstado(), ...parcial, ts: Date.now() }));
       difundir();
     },
     async votar(preguntaId, opcionId) {

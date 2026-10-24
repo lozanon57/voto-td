@@ -18,9 +18,10 @@
 
 <main class="movil">
   <div id="espera" class="espera">
-    <p style="font-size:17px;font-weight:600;color:#0b1924;margin-bottom:6px">Conectado a la sala</p>
+    <p style="font-size:17px;font-weight:600;color:#0b1924;margin-bottom:6px">Ya está dentro</p>
     <p style="margin:0 0 18px">Esperando a que empiece la primera pregunta</p>
     <span class="punto"></span><span class="punto"></span><span class="punto"></span>
+    <p class="conexion" id="conexion">Conectando…</p>
   </div>
 
   <section id="bloque" class="oculto">
@@ -51,7 +52,16 @@ let pintada = null;      // id de la pregunta ya montada en el DOM
 let miVoto = null;
 let editando = false;
 
+function pintarConexion(res) {
+  const cx = $("conexion");
+  if (!cx) return;
+  cx.textContent = res && res.detalle ? res.detalle : "";
+  cx.className = "conexion " + (res && res.modo === "local" ? "mal" : "bien");
+}
+if (datos.alCambiarConexion) datos.alCambiarConexion(pintarConexion);
+
 function avisarSiAislado(res) {
+  pintarConexion(res);
   if (!res || res.modo !== "local") return;
   const a = $("aviso");
   a.classList.remove("oculto");

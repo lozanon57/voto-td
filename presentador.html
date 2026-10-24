@@ -12,7 +12,7 @@
 
   <header class="cabecera">
     <div class="izq">36 CONGRESO NACIONAL DE CIRUGÍA · CNC 2026</div>
-    <div class="der">TUMORES DESMOIDES INTRAABDOMINALES · CASOS CLÍNICOS</div>
+    <div class="der">TUMORES DESMOIDES INTRAABDOMINALES</div>
   </header>
 
   <main class="cuerpo">
@@ -33,18 +33,18 @@
       <div class="url" id="url"></div>
       <div class="instruccion">Escanee con la cámara del móvil.<br>No hace falta instalar nada.</div>
       <div class="contador"><span id="n">0</span><span>votos</span></div>
+      <div class="conexion" id="conexion">Conectando…</div>
     </aside>
   </main>
 
   <div class="mandos oculto" id="mandos">
-    <button data-ir="" id="b0">Sala</button>
-    <button data-ir="p1" id="b1">Caso 1</button>
-    <button data-ir="p2" id="b2">Caso 2</button>
-    <button data-ir="p3" id="b3">Caso 3</button>
-    <button id="revelar">Mostrar respuesta</button>
+    <button id="sala" title="Pantalla de sala (tecla 0)">Sala</button>
+    <button id="anterior" title="Anterior (flecha izquierda)">◀</button>
+    <span class="numeros" id="numeros"></span>
+    <button id="siguiente" title="Siguiente (flecha derecha)">▶</button>
+    <button id="revelar" title="Mostrar u ocultar la respuesta (tecla R)">Mostrar respuesta</button>
     <span class="sep"></span>
-    <span class="estado" id="modo"></span>
-    <button id="reiniciar" class="peligro">Borrar votos de esta pregunta</button>
+    <button id="reiniciar" class="peligro">Borrar votos</button>
   </div>
 
   <div class="piecera">
@@ -56,20 +56,25 @@
 <script type="module">
 import { PREGUNTAS } from "./preguntas.js";
 import { datos, contar } from "./datos.js";
-import { CLAVE_CONTROL } from "./config.js";
 
 const $ = (id) => document.getElementById(id);
 const porId = Object.fromEntries(PREGUNTAS.map((p) => [p.id, p]));
+const orden = PREGUNTAS.map((p) => p.id);
 
-const params = new URLSearchParams(location.search);
-const mando = params.get("control") === CLAVE_CONTROL;
+// Los mandos salen por defecto: esta página es la del ponente. Para proyectarla
+// sin botones se abre con ?publico=1.
+const mando = new URLSearchParams(location.search).get("publico") !== "1";
 
-const urlVoto = location.href.replace(/presentador\.html.*$/, "");
-$("url").textContent = urlVoto.replace(/^https?:\/\//, "").replace(/\/$/, "");
+$("url").textContent = location.href
+  .replace(/presentador\.html.*$/, "")
+  .replace(/^https?:\/\//, "")
+  .replace(/\/$/, "");
 
 let estado = { pregunta: null, revelada: false };
 let votos = {};
 let pintada = null;
+
+// ------------------------------------------------------------- barras ------
 
 function montar(p) {
   const cont = $("barras");
@@ -81,7 +86,7 @@ function montar(p) {
     fila.innerHTML =
       '<div class="letra">' + o.id + "</div>" +
       '<div class="pista"><div class="relleno"></div><div class="texto"></div></div>' +
-      '<div class="pct">0%</div>';
+      '<div class="pct"></div>';
     fila.querySelector(".texto").textContent = o.texto;
     cont.appendChild(fila);
   });
@@ -105,7 +110,8 @@ function pintar() {
 
   if (pintada !== p.id) montar(p);
 
-  $("etiqueta").textContent = p.etiqueta;
+  const n = orden.indexOf(p.id) + 1;
+  $("etiqueta").textContent = `Pregunta ${n} de ${orden.length} · ${p.etiqueta}`;
   $("pregunta").textContent = p.pregunta;
   $("contexto").textContent = p.enunciado;
 
@@ -115,10 +121,9 @@ function pintar() {
 
   document.querySelectorAll(".fila").forEach((fila) => {
     const id = fila.dataset.opcion;
-    const n = conteo[id] || 0;
-    const pct = total ? Math.round((n / total) * 100) : 0;
+    const pct = total ? Math.round(((conteo[id] || 0) / total) * 100) : 0;
     fila.querySelector(".relleno").style.width = pct + "%";
-    fila.querySelector(".pct").textContent = estado.revelada || total ? pct + "%" : "";
+    fila.querySelector(".pct").textContent = total ? pct + "%" : "";
     fila.classList.toggle("es-correcta", estado.revelada && id === p.correcta);
     fila.classList.toggle("atenuada", estado.revelada && id !== p.correcta);
   });
@@ -136,43 +141,79 @@ function pintar() {
   marcarMandos();
 }
 
+// ------------------------------------------------------------- mandos ------
+
 function marcarMandos() {
   if (!mando) return;
-  [["", "b0"], ["p1", "b1"], ["p2", "b2"], ["p3", "b3"]].forEach(([v, id]) => {
-    $(id).classList.toggle("activo", (estado.pregunta || "") === v);
+  document.querySelectorAll("#numeros button").forEach((b) => {
+    b.classList.toggle("activo", b.dataset.pid === estado.pregunta);
   });
+  $("sala").classList.toggle("activo", !estado.pregunta);
   $("revelar").textContent = estado.revelada ? "Ocultar respuesta" : "Mostrar respuesta";
   $("revelar").classList.toggle("activo", !!estado.revelada);
 }
 
+const ir = (pid) => datos.fijarEstado({ pregunta: pid, revelada: false });
+
+function saltar(paso) {
+  const i = orden.indexOf(estado.pregunta);
+  if (i === -1) return ir(paso > 0 ? orden[0] : null);
+  const j = i + paso;
+  if (j < 0) return ir(null);
+  if (j >= orden.length) return;
+  ir(orden[j]);
+}
+
 if (mando) {
   $("mandos").classList.remove("oculto");
-  $("modo").textContent = "Conectando…";
-  document.querySelectorAll("[data-ir]").forEach((b) => {
-    b.addEventListener("click", () =>
-      datos.fijarEstado({ pregunta: b.dataset.ir || null, revelada: false })
-    );
+  const nums = $("numeros");
+  PREGUNTAS.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.textContent = String(i + 1);
+    b.dataset.pid = p.id;
+    b.title = p.etiqueta;
+    b.addEventListener("click", () => ir(p.id));
+    nums.appendChild(b);
   });
+  $("sala").addEventListener("click", () => ir(null));
+  $("anterior").addEventListener("click", () => saltar(-1));
+  $("siguiente").addEventListener("click", () => saltar(1));
   $("revelar").addEventListener("click", () =>
-    datos.fijarEstado({ revelada: !estado.revelada })
-  );
+    datos.fijarEstado({ revelada: !estado.revelada }));
   $("reiniciar").addEventListener("click", () => {
     if (!estado.pregunta) return;
-    if (confirm("¿Borrar todos los votos de " + estado.pregunta + "?")) datos.reiniciar(estado.pregunta);
+    const p = porId[estado.pregunta];
+    const n = orden.indexOf(p.id) + 1;
+    if (confirm(`¿Borrar todos los votos de la pregunta ${n}?`)) datos.reiniciar(p.id);
   });
   addEventListener("keydown", (e) => {
-    if (e.target.tagName === "INPUT") return;
-    const mapa = { "0": null, "1": "p1", "2": "p2", "3": "p3" };
-    if (e.key in mapa) datos.fijarEstado({ pregunta: mapa[e.key], revelada: false });
-    if (e.key === "r" || e.key === "R") datos.fijarEstado({ revelada: !estado.revelada });
+    if (e.target.tagName === "INPUT" || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); saltar(1); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); saltar(-1); }
+    else if (e.key === "0" || e.key === "Escape") ir(null);
+    else if (e.key === "r" || e.key === "R")
+      datos.fijarEstado({ revelada: !estado.revelada });
   });
 }
 
+// ----------------------------------------------------------- conexión ------
+
+function pintarConexion(res) {
+  const cx = $("conexion");
+  cx.textContent = res.detalle || res.modo;
+  cx.className = "conexion " +
+    (res.modo === "local" ? "mal" : (res.conectados < res.total ? "regular" : "bien"));
+}
+if (datos.alCambiarConexion) datos.alCambiarConexion(pintarConexion);
+
 datos.conectar().then((res) => {
-  if (mando) $("modo").textContent = res.detalle || res.modo;
+  pintarConexion(res);
   datos.escucharEstado((e) => { estado = e; pintar(); });
   datos.escucharVotos((v) => { votos = v; pintar(); });
 }).catch((err) => {
+  const cx = $("conexion");
+  cx.textContent = "Sin conexión";
+  cx.className = "conexion mal";
   $("pregunta").textContent = "No se ha podido conectar: " + (err && err.message ? err.message : "");
 });
 </script>
