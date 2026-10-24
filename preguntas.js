@@ -74,38 +74,6 @@ export const PREGUNTAS = [
   {
     "id": "p3",
     "etiqueta": "Diagnóstico · 3 de 4",
-    "enunciado": "Confirmada la fibromatosis tipo desmoide.",
-    "pregunta": "¿Qué estudio molecular aporta información pronóstica?",
-    "opciones": [
-      {
-        "id": "A",
-        "texto": "Mutación de CTNNB1 en el exón 3"
-      },
-      {
-        "id": "B",
-        "texto": "Mutación de KIT en el exón 11"
-      },
-      {
-        "id": "C",
-        "texto": "Amplificación de MDM2 y CDK4"
-      },
-      {
-        "id": "D",
-        "texto": "Translocación SS18-SSX"
-      },
-      {
-        "id": "E",
-        "texto": "Inestabilidad de microsatélites"
-      }
-    ],
-    "correcta": "A",
-    "clave": "CTNNB1 exón 3. La mutación S45F identifica a quien más probablemente dejará la vigilancia.",
-    "explicacion": "Los desmoides esporádicos mutan el exón 3 de CTNNB1 —T41A, S45F, S45P— en la gran mayoría; del 5% al 10% se asocian a mutación de APC en el contexto de poliposis adenomatosa familiar, y menos del 5% son wild-type. En el ensayo GRAFITI la mutación S45F fue el único predictor independiente de pasar de vigilancia activa a tratamiento (HR 4,64; IC95% 1,38-15,8). No cambia el tratamiento de entrada, pero sí la intensidad del seguimiento y lo que se le cuenta al paciente.",
-    "referencias": "Crago AM. Genes Chromosomes Cancer 2015 · Schut AR. Ann Surg 2023 (GRAFITI)"
-  },
-  {
-    "id": "p4",
-    "etiqueta": "Diagnóstico · 4 de 4",
     "enunciado": "Desmoide mesentérico confirmado en una paciente de 51 años.",
     "pregunta": "¿Qué hay que descartar siempre?",
     "opciones": [
@@ -132,8 +100,40 @@ export const PREGUNTAS = [
     ],
     "correcta": "E",
     "clave": "Poliposis adenomatosa familiar. Cambia la estrategia entera, y el desmoide es la primera causa de mortalidad no colorrectal en estos pacientes.",
-    "explicacion": "Entre el 5% y el 10% de los desmoides se asocian a PAF por mutación de APC, y la proporción sube en los intraabdominales. En la serie del MSKCC (n = 155) el 9% tenía PAF, pero con el doble de localizaciones desfavorables o multifocales (50% frente a 24%) y casi el triple de tratamiento sistémico de entrada (50% frente a 18,4%). Ante un desmoide mesentérico: anamnesis familiar dirigida, colonoscopia y estudio de APC.",
+    "explicacion": "Entre el 5% y el 10% de los desmoides se asocian a PAF por mutación de APC, y la proporción sube en los intraabdominales. En la serie del MSKCC (n = 155) el 9% tenía PAF, pero con el doble de localizaciones desfavorables o multifocales (50% frente a 24%) y una edad mediana muy inferior. Ante un desmoide mesentérico: anamnesis familiar dirigida, colonoscopia y estudio de APC.",
     "referencias": "Nieuwenhuis MH. Int J Cancer 2011 · Serie MSKCC 1993-2023"
+  },
+  {
+    "id": "p4",
+    "etiqueta": "Diagnóstico · 4 de 4",
+    "enunciado": "Confirmada la fibromatosis tipo desmoide.",
+    "pregunta": "¿Qué estudio molecular aporta información pronóstica?",
+    "opciones": [
+      {
+        "id": "A",
+        "texto": "Mutación de CTNNB1 en el exón 3"
+      },
+      {
+        "id": "B",
+        "texto": "Mutación de KIT en el exón 11"
+      },
+      {
+        "id": "C",
+        "texto": "Amplificación de MDM2 y CDK4"
+      },
+      {
+        "id": "D",
+        "texto": "Translocación SS18-SSX"
+      },
+      {
+        "id": "E",
+        "texto": "Inestabilidad de microsatélites"
+      }
+    ],
+    "correcta": "A",
+    "clave": "CTNNB1 exón 3. La mutación S45F identifica a quien más probablemente acabará necesitando tratamiento.",
+    "explicacion": "Los desmoides esporádicos mutan el exón 3 de CTNNB1 —T41A, S45F, S45P— en la gran mayoría; del 5% al 10% se asocian a mutación de APC en el contexto de poliposis adenomatosa familiar, y menos del 5% son wild-type. En el ensayo GRAFITI la mutación S45F fue el único predictor independiente de acabar necesitando tratamiento (HR 4,64; IC95% 1,38-15,8). No cambia la decisión inicial, pero sí la intensidad del seguimiento y lo que se le cuenta al paciente.",
+    "referencias": "Crago AM. Genes Chromosomes Cancer 2015 · Schut AR. Ann Surg 2023 (GRAFITI)"
   },
   {
     "id": "p5",
