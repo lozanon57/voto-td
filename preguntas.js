@@ -266,129 +266,129 @@ export const PREGUNTAS = [
   {
     "id": "p9",
     "etiqueta": "Complicado · 1 de 4",
-    "enunciado": "Varón con síndrome de Gardner, panproctocolectomía con anastomosis ileorrectal en 2016. TC: masa mesentérica de 82 × 71 mm y nódulos mesentéricos adicionales. Asintomático.",
-    "pregunta": "¿Cuál es la primera línea?",
+    "enunciado": "Mujer de 48 años. Laparotomía urgente por peritonitis. Se encuentra una masa de 30 cm en la raíz del mesenterio que engloba asas, y líquido fecaloideo libre por perforación de un asa englobada.",
+    "pregunta": "¿Qué hace en ese quirófano?",
     "opciones": [
       {
         "id": "A",
-        "texto": "Resección mesentérica con intención R0"
+        "texto": "Resección en bloque de la masa con el intestino englobado"
       },
       {
         "id": "B",
-        "texto": "Resección profiláctica antes de que crezca más"
+        "texto": "Exéresis parcial para citorreducir, y anastomosis"
       },
       {
         "id": "C",
-        "texto": "Tratamiento sistémico"
+        "texto": "Biopsia, derivación del asa perforada y drenaje, sin resecar la masa"
       },
       {
         "id": "D",
-        "texto": "Radioterapia abdominal"
+        "texto": "Cerrar y trasladar sin ningún gesto"
       },
       {
         "id": "E",
-        "texto": "Observación clínica sin imagen"
+        "texto": "Resección con intención R0 y ostomía terminal"
       }
     ],
     "correcta": "C",
-    "clave": "Tratamiento sistémico. En PAF la cirugía se evita siempre que sea posible.",
-    "explicacion": "El trauma quirúrgico estimula la enfermedad, la resección mesentérica radical conlleva síndrome de intestino corto y recidiva casi segura, y la cirugía profiláctica está formalmente contraindicada. El consenso de 2024 recomienda evitar incluso la biopsia cuando la imagen es típica en un paciente con PAF conocida. En la serie del MSKCC el 50% de los pacientes con PAF recibió tratamiento sistémico de entrada, frente al 18,4% de los esporádicos.",
+    "clave": "Biopsia, derivar y drenar. Resecar 30 cm en la raíz del mesenterio es isquemia intestinal segura.",
+    "explicacion": "En el desmoide mesentérico la cirugía urgente se reserva a la complicación y se hace con el gesto mínimo que la resuelva: derivación, bypass, estoma o drenaje. Intentar la resección de una masa que engloba la raíz mesentérica condena al paciente a un síndrome de intestino corto y, en el desmoide, el trauma quirúrgico es además un estímulo para la enfermedad. Lo que sí hay que hacer en ese quirófano es tomar biopsia: el diagnóstico histológico abre todas las puertas terapéuticas posteriores.",
     "referencias": "Kasper B. JAMA Oncol 2024 · Serie MSKCC 1993-2023"
   },
   {
     "id": "p10",
     "etiqueta": "Complicado · 2 de 4",
-    "enunciado": "Progresión tras sulindac y tamoxifeno, y después tras tres ciclos de doxorrubicina liposomal.",
-    "pregunta": "¿Qué línea elige ahora?",
+    "enunciado": "Al tercer día, dehiscencia de la yeyunostomía, resuelta con resección del segmento abierto y anastomosis. Seis semanas después vuelve a urgencias hipotensa: absceso que drena por la herida y asa yeyunal englobada perforada.",
+    "pregunta": "¿Cuál es el siguiente paso?",
     "opciones": [
       {
         "id": "A",
-        "texto": "Sorafenib"
+        "texto": "Relaparotomía y resección del foco"
       },
       {
         "id": "B",
-        "texto": "Repetir doxorrubicina liposomal a dosis plenas"
+        "texto": "Antibiótico dirigido y drenaje percutáneo guiado por imagen"
       },
       {
         "id": "C",
-        "texto": "Metotrexato y vinblastina"
+        "texto": "Laparostomía con sistema de vacío"
       },
       {
         "id": "D",
-        "texto": "Imatinib"
+        "texto": "Empezar quimioterapia de inmediato"
       },
       {
         "id": "E",
-        "texto": "Cirugía de rescate"
+        "texto": "Antibiótico aislado, sin drenar"
       }
     ],
-    "correcta": "A",
-    "clave": "Sorafenib: respuesta objetiva del 33% y mejora significativa de la supervivencia libre de progresión en ensayo aleatorizado.",
-    "explicacion": "Frente a placebo, el sorafenib logró una tasa de respuesta objetiva del 33% y una mejoría significativa de la supervivencia libre de progresión. Metotrexato con vinblastina e imatinib siguen siendo alternativas en pacientes seleccionados, con menor tasa de respuesta. Repetir la antraciclina tras progresión no aporta. Y la cirugía de rescate en un PAF multifocal no está indicada mientras queden líneas sistémicas y no haya complicación: este paciente aún no la tiene.",
-    "referencias": "Gounder MM. N Engl J Med 2018 · Kasper B. JAMA Oncol 2024"
+    "correcta": "B",
+    "clave": "Antibiótico y drenaje percutáneo. Cada relaparotomía sobre un desmoide mesentérico añade morbilidad y estímulo tumoral.",
+    "explicacion": "La paciente recibió meropenem y un drenaje percutáneo del absceso, con tolerancia completa a la dieta, apirexia y estabilidad hemodinámica en pocos días. La alternativa quirúrgica habría significado abrir por tercera vez un abdomen con un tumor que infiltra el mesenterio, con alto riesgo de nuevas fístulas. El drenaje percutáneo es aquí lo que permite llegar en condiciones al tratamiento oncológico.",
+    "referencias": "Caso HGUGM · Kasper B. JAMA Oncol 2024"
   },
   {
     "id": "p11",
     "etiqueta": "Complicado · 3 de 4",
-    "enunciado": "Dos años después ingresa por cuadros suboclusivos de repetición. TC: masa que infiltra la anastomosis ileorrectal con dilatación ileal retrógrada.",
-    "pregunta": "¿Qué cirugía plantea?",
+    "enunciado": "Resuelta la sepsis, tolera dieta y está afebril. La TC muestra una masa de 10,9 × 17,3 × 22,5 cm que engloba la raíz mesentérica.",
+    "pregunta": "¿Cuál es la estrategia?",
     "opciones": [
       {
         "id": "A",
-        "texto": "Resección mesentérica radical con intención R0"
+        "texto": "Cirugía radical programada ahora que está estable"
       },
       {
         "id": "B",
-        "texto": "Resección multivisceral y anastomosis primaria"
+        "texto": "Tratamiento sistémico primero y reevaluar la cirugía según la respuesta"
       },
       {
         "id": "C",
-        "texto": "El gesto mínimo que resuelva la obstrucción: derivación, bypass o estoma"
+        "texto": "Vigilancia activa indefinida"
       },
       {
         "id": "D",
-        "texto": "Ninguna: subir la dosis del tratamiento sistémico"
+        "texto": "Radioterapia abdominal y después cirugía"
       },
       {
         "id": "E",
-        "texto": "Radioterapia pélvica"
+        "texto": "Derivación definitiva y cuidados de soporte"
       }
     ],
-    "correcta": "C",
-    "clave": "El gesto mínimo eficaz. El objetivo es devolver el tránsito, no resecar el tumor.",
-    "explicacion": "En el desmoide asociado a PAF la cirugía se reserva a la complicación que amenaza la vida o la función —obstrucción, isquemia, perforación, fístula— y se hace con la menor morbilidad posible. La resección radical en este escenario significa intestino corto, exenteración o derivación urinaria, y recidiva. En la serie del MSKCC, 14 pacientes (9%) debutaron con complicación —6 obstrucciones, 5 perforaciones, 3 fistulizaciones—; la mortalidad por enfermedad de toda la serie fue del 0,6%, un paciente de 155.",
-    "referencias": "Kasper B. JAMA Oncol 2024 · Serie MSKCC 1993-2023"
+    "correcta": "B",
+    "clave": "Sistémico primero. La cirugía se decide después, con la masa reducida y separada de la raíz.",
+    "explicacion": "Esta paciente recibió ocho ciclos de doxorrubicina liposomal, con reacción alérgica en el cuarto ciclo que obligó a una pauta de desensibilización, y toxicidad por lo demás manejable: eritrodisestesia palmoplantar grado 1, astenia grado 2 y mucositis grado 1. La secuencia importa más que el agente: la decisión quirúrgica se toma sobre el tumor que queda, no sobre el que había. Menos del 5-10% de los pacientes acaba necesitando un rescate quirúrgico, y conviene que sea el que de verdad se puede hacer bien.",
+    "referencias": "Caso HGUGM · Salas S. J Clin Oncol 2011 · Serie MSKCC 1993-2023"
   },
   {
     "id": "p12",
     "etiqueta": "Complicado · 4 de 4",
-    "enunciado": "Otro paciente del mismo perfil, con varias resecciones previas, llega a fallo intestinal dependiente de nutrición parenteral, con desmoide mesentérico irresecable.",
-    "pregunta": "¿Qué opción contempla?",
+    "enunciado": "Misma presentación, mismo tumor, pero en un paciente con poliposis adenomatosa familiar y colectomía previa.",
+    "pregunta": "¿Qué cambiaría?",
     "opciones": [
       {
         "id": "A",
-        "texto": "Resección R0 a cualquier precio"
+        "texto": "Nada: el manejo es exactamente el mismo"
       },
       {
         "id": "B",
-        "texto": "Evaluación para trasplante intestinal en centro de referencia"
+        "texto": "Se operaría antes, de forma profiláctica, para adelantarse al crecimiento"
       },
       {
         "id": "C",
-        "texto": "Radioterapia abdominal total"
+        "texto": "Se evitaría la cirugía aún más, con el tratamiento sistémico como estrategia central"
       },
       {
         "id": "D",
-        "texto": "Cuidados de soporte exclusivamente"
+        "texto": "Se trataría solo con radioterapia"
       },
       {
         "id": "E",
-        "texto": "Nueva línea sistémica indefinida"
+        "texto": "Se indicaría trasplante intestinal de entrada"
       }
     ],
-    "correcta": "B",
-    "clave": "Trasplante intestinal: rescate real en fallo intestinal establecido, en centros muy seleccionados.",
-    "explicacion": "En la Roy Calne Transplant Unit de Cambridge, entre octubre de 2007 y septiembre de 2023 se hicieron 144 trasplantes intestinales, 15 de ellos (9%) por desmoide asociado a PAF: 5 con procedimiento secuencial y 10 simultáneo, con supervivencia global a 5 años del 82% y 10 de los 15 pacientes vivos en seguimiento a largo plazo. Sigue siendo una indicación excepcional y en investigación, pero deja de ser teórica cuando el intestino ya se ha perdido.",
-    "referencias": "Canovai E. Transplant Direct 2024"
+    "correcta": "C",
+    "clave": "En PAF se evita la cirugía todavía más. Solo ante complicación vital, y con el gesto de menor morbilidad.",
+    "explicacion": "El trauma quirúrgico estimula la enfermedad y la resección mesentérica radical conlleva intestino corto y recidiva casi segura; la cirugía profiláctica está contraindicada y el consenso de 2024 recomienda evitar incluso la biopsia cuando la imagen es típica en un paciente con PAF conocida. En la serie del MSKCC el 50% de los pacientes con PAF recibió tratamiento sistémico de entrada, frente al 18,4% de los esporádicos. Cuando el intestino ya se ha perdido queda el trasplante: en Cambridge, 15 de 144 trasplantes intestinales se indicaron por desmoide asociado a PAF, con supervivencia global a 5 años del 82%.",
+    "referencias": "Kasper B. JAMA Oncol 2024 · Canovai E. Transplant Direct 2024 · Serie MSKCC"
   }
 ];
