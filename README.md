@@ -16,6 +16,24 @@ audiencia necesitáis cuenta, registro ni instalar nada.
 
 ## 1 · Cómo se usa el día de la charla
 
+Hay **dos modos**, y los dos funcionan. Lo que decide cuál usas es una sola
+cosa: si proyectas desde tu portátil o desde el ordenador de la sala. Pregúntalo
+en la secretaría técnica al entregar el archivo.
+
+| | Modo A · tu portátil | Modo B · ordenador de la sala |
+|---|---|---|
+| Qué proyectas | `charla.html` | el `.pptx` |
+| Dónde salen las barras | en la pantalla grande, dentro de la opción | en los móviles de la sala, uno a uno |
+| Quién abre cada pregunta | se abre sola al entrar en la diapositiva | la abres tú desde tu móvil |
+| Qué llevas en la mano | el mando | el mando y tu móvil con `presentador.html` |
+
+El modo A es mejor y es para el que está hecho todo esto. Pero **el modo B no
+es un apaño**: el QR está impreso en las doce diapositivas de pregunta, y cada
+asistente ve en su teléfono el recuento en directo, la respuesta razonada y las
+referencias. Lo único que se pierde es la barra en la pantalla grande.
+
+### Modo A · desde tu portátil
+
 **La charla entera va en `charla.html`, en una sola pantalla.** Las
 diapositivas son las mismas del PowerPoint —se exportan del propio `.pptx`— y
 las barras de voto se dibujan dentro de la opción impresa, no en una ventana
@@ -60,11 +78,29 @@ y pide el voto a mano alzada. Las imágenes de `charla.html` se precargan
 enteras al abrir la página, así que una caída a mitad de charla no deja la
 presentación en blanco.
 
-## 1 bis · El presentador clásico
+### Modo B · desde el ordenador de la sala
 
-`presentador.html` sigue existiendo para quien prefiera proyectar el PowerPoint
-y llevar las barras en un móvil o en una segunda pantalla. Ahí las preguntas se
-lanzan a mano con las flechas y la respuesta se revela con `R`.
+Entregas el `.pptx` y avanzas con el mando, como cualquier charla. Las barras
+las llevas tú en el móvil, con `presentador.html`, que en pantalla de teléfono
+deja la pregunta, las cinco barras y el teclado numérico a la vista sin
+desplazar.
+
+1. Antes de subir, abre en **tu** móvil, en vertical y en silencio:
+   `https://lozanon57.github.io/voto-td/presentador.html`
+2. Al llegar a cada diapositiva de pregunta, **pulsa su número**. Aquí las
+   preguntas no se abren solas: eso solo pasa en el modo A.
+3. Al pasar a la diapositiva de respuesta, pulsa **«Mostrar respuesta»**.
+4. Lee el reparto y dilo en voz alta —«la sala se parte entre resecar y
+   biopsiar»—. Eso es lo que sustituye a la barra proyectada.
+
+`Borrar votos` limpia la pregunta que tengas abierta; hazlo en las doce antes
+de empezar si has ensayado.
+
+**Lo que no hay que intentar**: incrustar la votación dentro del PowerPoint con
+un complemento (Web Viewer, Slido, Mentimeter). Necesita que el ordenador de la
+sala tenga el complemento instalado, sesión de Office iniciada y conexión, y en
+modo presentación falla con facilidad. En una sala ajena no se juega la charla
+a eso.
 
 ## 1 ter · Probarlo tú solo, sin montar nada
 
