@@ -99,9 +99,9 @@ export const PREGUNTAS = [
       }
     ],
     "correcta": "E",
-    "clave": "Poliposis adenomatosa familiar. Cambia la estrategia entera, y el desmoide es la primera causa de mortalidad no colorrectal en estos pacientes.",
-    "explicacion": "Entre el 5% y el 10% de los desmoides se asocian a PAF por mutación de APC, y la proporción sube en los intraabdominales. En la serie del MSKCC (n = 155) el 9% tenía PAF, pero con el doble de localizaciones desfavorables o multifocales (50% frente a 24%) y una edad mediana muy inferior. Ante un desmoide mesentérico: anamnesis familiar dirigida, colonoscopia y estudio de APC.",
-    "referencias": "Nieuwenhuis MH. Int J Cancer 2011 · Serie MSKCC 1993-2023"
+    "clave": "Poliposis adenomatosa familiar. Cambia la estrategia entera, y el desmoide es una de las principales causas de muerte en la PAF ya operada.",
+    "explicacion": "Entre el 5% y el 10% de los desmoides se asocian a PAF por mutación de APC, y la proporción sube en los intraabdominales. En la serie del MSKCC (n = 155) el 9% tenía PAF, pero con el doble de localizaciones desfavorables o multifocales (50% frente a 24%) y una edad mediana muy inferior. La indicación de cribado es amplia: la guía europea EHTG-ESCP de 2024 recomienda que todo paciente con un desmoide y sin PAF conocida sea estudiado con colonoscopia y, si es posible, análisis del gen APC, y subraya el subgrupo de menores de 60 años y los desmoides intraabdominales o de la pared abdominal (nivel de evidencia bajo, acuerdo del 89%). Si el cribado sale positivo el paciente pasa a ser una familia: consejo genético y estudio de hermanos e hijos.",
+    "referencias": "Zaffaroni G. Br J Surg 2024 (EHTG-ESCP) · Nieuwenhuis MH. Int J Cancer 2011 · Serie MSKCC 1993-2023"
   },
   {
     "id": "p4",
@@ -132,7 +132,7 @@ export const PREGUNTAS = [
     ],
     "correcta": "A",
     "clave": "CTNNB1 exón 3. La mutación S45F identifica a quien más probablemente acabará necesitando tratamiento.",
-    "explicacion": "Los desmoides esporádicos mutan el exón 3 de CTNNB1 —T41A, S45F, S45P— en la gran mayoría; del 5% al 10% se asocian a mutación de APC en el contexto de poliposis adenomatosa familiar, y menos del 5% son wild-type. En el ensayo GRAFITI la mutación S45F fue el único predictor independiente de acabar necesitando tratamiento (HR 4,64; IC95% 1,38-15,8). No cambia la decisión inicial, pero sí la intensidad del seguimiento y lo que se le cuenta al paciente.",
+    "explicacion": "Los desmoides esporádicos mutan el exón 3 de CTNNB1 —T41A, S45F, S45P— en la gran mayoría; del 5% al 10% se asocian a mutación de APC en el contexto de poliposis adenomatosa familiar, y menos del 5% son wild-type. En el ensayo GRAFITI la mutación S45F fue el único predictor independiente de acabar necesitando tratamiento (HR 4,64; IC95% 1,38-15,8). CTNNB1 y APC son además mutuamente excluyentes, así que encontrar CTNNB1 hace la PAF muy poco probable. No cambia la decisión inicial, pero sí la intensidad del seguimiento y lo que se le cuenta al paciente.",
     "referencias": "Crago AM. Genes Chromosomes Cancer 2015 · Schut AR. Ann Surg 2023 (GRAFITI)"
   },
   {
@@ -298,7 +298,7 @@ export const PREGUNTAS = [
   {
     "id": "p10",
     "etiqueta": "Complicado · 2 de 4",
-    "enunciado": "Al tercer día, dehiscencia de la yeyunostomía, resuelta con resección del segmento abierto y anastomosis. Seis semanas después vuelve a urgencias hipotensa: absceso que drena por la herida y asa yeyunal englobada perforada.",
+    "enunciado": "Seis semanas después de la cirugía inicial vuelve a urgencias hipotensa: absceso que drena por la herida y asa yeyunal englobada perforada.",
     "pregunta": "¿Cuál es el siguiente paso?",
     "opciones": [
       {
@@ -388,7 +388,7 @@ export const PREGUNTAS = [
     ],
     "correcta": "C",
     "clave": "En PAF se evita la cirugía todavía más. Solo ante complicación vital, y con el gesto de menor morbilidad.",
-    "explicacion": "El trauma quirúrgico estimula la enfermedad y la resección mesentérica radical conlleva intestino corto y recidiva casi segura; la cirugía profiláctica está contraindicada y el consenso de 2024 recomienda evitar incluso la biopsia cuando la imagen es típica en un paciente con PAF conocida. En la serie del MSKCC el 50% de los pacientes con PAF recibió tratamiento sistémico de entrada, frente al 18,4% de los esporádicos. Cuando el intestino ya se ha perdido queda el trasplante: en Cambridge, 15 de 144 trasplantes intestinales se indicaron por desmoide asociado a PAF, con supervivencia global a 5 años del 82%.",
+    "explicacion": "El trauma quirúrgico estimula la enfermedad y la resección mesentérica radical conlleva intestino corto y recidiva casi segura; la cirugía profiláctica está contraindicada. Con la biopsia el consenso pide cautela, no la prohíbe: en un mesenterio ya operado de PAF una masa nueva es casi siempre un desmoide, pero no hay datos para descartar la biopsia por completo. En la serie del MSKCC el 50% de los pacientes con PAF recibió tratamiento sistémico de entrada, frente al 18,4% de los esporádicos. Cuando el intestino ya se ha perdido queda el trasplante, y aquí hay que ser honesto con la evidencia: el consenso global lo desaconseja como estrategia, mientras las series de los centros de trasplante lo sostienen como rescate en el fallo intestinal establecido. En Cambridge, 15 de 144 trasplantes intestinales se indicaron por desmoide asociado a PAF, con supervivencia global a 5 años del 82%.",
     "referencias": "Kasper B. JAMA Oncol 2024 · Canovai E. Transplant Direct 2024 · Serie MSKCC"
   }
 ];
