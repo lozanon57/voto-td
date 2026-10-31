@@ -437,4 +437,16 @@ button.opcion.fallida { opacity: .5; }
   .mandos { padding: 10px 14px; gap: 6px; }
   .mandos .sep { flex: 0 0 100%; height: 0; }
   .piecera { flex-direction: column; gap: 2px; padding: 8px 14px; }
+
+  /* El ponente llevando esta página en el móvil (modo B: el PowerPoint se
+     proyecta desde el ordenador de la sala y las barras se leen aquí). El QR
+     y su instrucción sobran en SU teléfono y se comían el tercio superior,
+     que es justo donde tienen que estar las barras. En ?publico=1, que es la
+     página proyectada, no se toca nada: ahí el QR es lo importante. */
+  body.con-mandos .lateral { grid-template-columns: 1fr auto; }
+  body.con-mandos .lateral .qr,
+  body.con-mandos .lateral .instruccion { display: none; }
+  body.con-mandos .lateral .url,
+  body.con-mandos .lateral .conexion { grid-column: 1; }
+  body.con-mandos .contador { grid-column: 2; grid-row: 1 / span 2; }
 }

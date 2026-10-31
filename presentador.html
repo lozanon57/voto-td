@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Presentador · Tumores desmoides intraabdominales · CNC 2026</title>
-<link rel="stylesheet" href="estilo.css">
+<link rel="stylesheet" href="estilo.css?v=e69d5f131d">
 </head>
 <body>
 
@@ -32,7 +32,7 @@
       <div class="qr"><img id="qr" src="assets/qr.png" alt="Código QR para votar"></div>
       <div class="url" id="url"></div>
       <div class="instruccion">Escanee con la cámara del móvil.<br>No hace falta instalar nada.</div>
-      <div class="contador"><span id="n">0</span><span>votos</span></div>
+      <div class="contador"><span id="n">0</span><span id="palabra">votos</span></div>
       <div class="conexion" id="conexion">Conectando…</div>
     </aside>
   </main>
@@ -104,6 +104,7 @@ function pintar() {
     $("barras").innerHTML = "";
     $("respuesta").classList.add("oculto");
     $("n").textContent = "0";
+    $("palabra").textContent = "votos";
     marcarMandos();
     return;
   }
@@ -118,6 +119,7 @@ function pintar() {
   const conteo = contar(votos[p.id], p.opciones);
   const total = conteo.total;
   $("n").textContent = String(total);
+  $("palabra").textContent = total === 1 ? "voto" : "votos";
 
   document.querySelectorAll(".fila").forEach((fila) => {
     const id = fila.dataset.opcion;
@@ -165,6 +167,9 @@ function saltar(paso) {
 }
 
 if (mando) {
+  // Marca la página como "la del ponente": en el móvil el CSS esconde el QR
+  // para dejarle la pantalla a las barras.
+  document.body.classList.add("con-mandos");
   $("mandos").classList.remove("oculto");
   const nums = $("numeros");
   PREGUNTAS.forEach((p, i) => {
