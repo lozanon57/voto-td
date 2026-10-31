@@ -2,7 +2,7 @@
 // El banco de preguntas vive en build/preguntas.py, junto a la presentación.
 
 export const SESION = {
-  titulo: "Tumores desmoides intraabdominales",
+  titulo: "Casos controvertidos interactivos · Desmoide abdominal",
   subtitulo: "Sesión interactiva · 36 Congreso Nacional de Cirugía · CNC 2026",
 };
 

@@ -1,4 +1,4 @@
-# Votación en directo — Tumores desmoides intraabdominales (CNC 2026)
+# Votación en directo — Casos controvertidos interactivos. Desmoide abdominal (CNC 2026)
 
 Sistema de voto en vivo para la sesión de casos clínicos del 36 Congreso
 Nacional de Cirugía. La sala vota desde el móvil escaneando un QR y las barras
