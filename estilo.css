@@ -384,28 +384,39 @@ button.opcion.fallida { opacity: .5; }
 .nav-demo { display: flex; gap: 10px; margin-top: 18px; }
 .nav-demo .boton { flex: 1; }
 
-/* ---------------- resultado en vivo en el móvil ---------------- */
+/* ---------------- recuento en vivo en el móvil ---------------- */
+/* La barra de cada opción va dentro del propio botón: el recuento se ve sin
+   bajar de pantalla, igual que en la diapositiva. */
 
-.resultado { margin-top: 18px; }
-.resultado-cab {
-  margin: 0 0 10px;
+.recuento {
+  margin: -6px 0 10px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--grey);
+  font-variant-numeric: tabular-nums;
 }
-.mini { display: grid; grid-template-columns: 22px 1fr 40px; align-items: center; gap: 8px; margin-bottom: 7px; }
-.mini-letra { font-size: 13px; font-weight: 700; color: var(--navy2); }
-.mini-pista { height: 12px; border-radius: 6px; background: var(--claro); overflow: hidden; }
-.mini-relleno {
-  display: block; height: 100%; width: 0;
-  background: linear-gradient(90deg, var(--teal), var(--cyan));
+.recuento .vivo {
+  display: inline-block; width: 8px; height: 8px; margin-right: 7px;
+  border-radius: 50%; background: var(--teal); vertical-align: 1px;
+  animation: late 1.4s infinite ease-in-out;
+}
+button.opcion { position: relative; overflow: hidden; }
+button.opcion .opcion-relleno {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+  background: #dcEEF3;
   transition: width .4s cubic-bezier(.22,.8,.3,1);
 }
-.mini-pct { font-size: 12px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; color: var(--navy2); }
-.mini.acierto .mini-relleno { background: linear-gradient(90deg, #1f7d3c, var(--green)); }
-.mini.acierto .mini-letra, .mini.acierto .mini-pct { color: var(--green); }
+button.opcion .letra, button.opcion .texto, button.opcion .opcion-pct { position: relative; }
+button.opcion .texto { flex: 1; }
+button.opcion .opcion-pct {
+  flex: 0 0 auto; min-width: 3.2ch; text-align: right;
+  font-weight: 700; color: var(--navy2); font-variant-numeric: tabular-nums;
+}
+button.opcion[aria-pressed="true"] .opcion-relleno { background: #c5e6ee; }
+button.opcion.correcta .opcion-relleno { background: #cdebd6; }
+button.opcion.correcta .opcion-pct { color: var(--green); }
 
 .explicacion {
   margin-top: 16px;

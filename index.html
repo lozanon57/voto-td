@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1924">
 <title>Vota · Casos controvertidos · Desmoide abdominal · CNC 2026</title>
-<link rel="stylesheet" href="estilo.css?v=e69d5f131d">
+<link rel="stylesheet" href="estilo.css?v=7e7cd0ef4b">
 </head>
 <body>
 
@@ -42,9 +42,9 @@
     <p class="etiqueta" id="etiqueta"></p>
     <p class="vineta" id="vineta"></p>
     <p class="pregunta" id="pregunta"></p>
+    <p id="recuento" class="recuento oculto"></p>
     <div class="opciones" id="opciones"></div>
     <div id="confirmado" class="confirmado oculto"></div>
-    <div id="resultado" class="resultado oculto"></div>
     <div id="explicacion" class="explicacion oculto"></div>
     <button id="cambiar" class="cambiar oculto">Cambiar mi respuesta</button>
     <div id="navDemo" class="nav-demo oculto">
@@ -121,8 +121,15 @@ function montar(p) {
     l.className = "letra";
     l.textContent = o.id;
     const t = document.createElement("span");
+    t.className = "texto";
     t.textContent = o.texto;
-    b.append(l, t);
+    // La barra del recuento va dentro de la propia opción, como en la pantalla
+    // grande: así se ve sin bajar, que debajo de cinco opciones nadie la miraba.
+    const relleno = document.createElement("span");
+    relleno.className = "opcion-relleno";
+    const pct = document.createElement("span");
+    pct.className = "opcion-pct";
+    b.append(relleno, l, t, pct);
     b.addEventListener("click", () => {
       if (b.disabled) return;
       if (demo) {
@@ -140,27 +147,17 @@ function montar(p) {
   pintada = (demo ? "demo:" : "") + p.id;
 }
 
-function pintarBarras(p) {
-  const caja = $("resultado");
-  if (demo) { caja.classList.add("oculto"); return; }
-  const conteo = contar(votos[p.id], p.opciones);
-  if (!conteo.total) { caja.classList.add("oculto"); return; }
-  caja.classList.remove("oculto");
-  caja.innerHTML = "";
-  const cab = document.createElement("p");
-  cab.className = "resultado-cab";
-  cab.textContent = conteo.total === 1 ? "1 voto en la sala" : conteo.total + " votos en la sala";
-  caja.appendChild(cab);
-  p.opciones.forEach((o) => {
-    const n = conteo[o.id] || 0;
-    const pct = Math.round((n / conteo.total) * 100);
-    const fila = document.createElement("div");
-    fila.className = "mini" + (estado.revelada && o.id === p.correcta ? " acierto" : "");
-    fila.innerHTML = '<span class="mini-letra">' + o.id + "</span>" +
-                     '<span class="mini-pista"><span class="mini-relleno"></span></span>' +
-                     '<span class="mini-pct">' + pct + "%</span>";
-    fila.querySelector(".mini-relleno").style.width = pct + "%";
-    caja.appendChild(fila);
+function pintarRecuento(p) {
+  const cab = $("recuento");
+  const conteo = demo ? { total: 0 } : contar(votos[p.id], p.opciones);
+  const total = conteo.total;
+  cab.classList.toggle("oculto", demo);
+  cab.innerHTML = '<span class="vivo"></span>' +
+    (total === 1 ? "1 voto en la sala" : total + " votos en la sala") + " · en directo";
+  document.querySelectorAll("button.opcion").forEach((b) => {
+    const pct = total ? Math.round(((conteo[b.dataset.opcion] || 0) / total) * 100) : 0;
+    b.querySelector(".opcion-relleno").style.width = pct + "%";
+    b.querySelector(".opcion-pct").textContent = total ? pct + "%" : "";
   });
 }
 
@@ -220,11 +217,20 @@ function pintar() {
     }
   }
 
-  if (!demo) pintarBarras(p); else $("resultado").classList.add("oculto");
+  pintarRecuento(p);
   $("navDemo").classList.toggle("oculto", !demo);
 }
 
 $("cambiar").addEventListener("click", () => { editando = true; pintar(); });
+
+// Con la sala votando a la vez llegan cientos de votos por segundo, y cada uno
+// por dos o tres servidores: se repinta como mucho una vez por fotograma.
+let pendiente = false;
+function programar() {
+  if (pendiente) return;
+  pendiente = true;
+  requestAnimationFrame(() => { pendiente = false; pintar(); });
+}
 
 // ------------------------------------------------------------ modo prueba --
 
@@ -260,7 +266,7 @@ idCliente();
 datos.conectar().then((res) => {
   avisarSiAislado(res);
   datos.escucharEstado((e) => { estado = e; pintar(); });
-  datos.escucharVotos((v) => { votos = v; pintar(); });
+  datos.escucharVotos((v) => { votos = v; programar(); });
 }).catch((err) => {
   const a = $("aviso");
   a.classList.remove("oculto");
