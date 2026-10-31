@@ -234,8 +234,8 @@ export const PREGUNTAS = [
   {
     "id": "p8",
     "etiqueta": "Tratamiento · 4 de 4",
-    "enunciado": "Vuelve el caso. Nirogacestat 150 mg cada 12 horas desde enero de 2026. En marzo la masa pasa de 15 × 14 × 10,8 a 20 × 17 × 14 cm y comprime la 2.ª y 3.ª porción duodenal. Irresecable.",
-    "pregunta": "¿Cuál es el siguiente paso?",
+    "enunciado": "Vuelve el caso, en vigilancia activa y sin tratamiento previo. En marzo de 2026 la masa pasa de 15 × 14 × 10,8 a 20 × 17 × 14 cm, centrada en la raíz del mesenterio: desplaza los vasos mesentéricos superiores y comprime la 2.ª y 3.ª porción duodenal, con distensión gástrica. Irresecable.",
+    "pregunta": "¿Cuál es el tratamiento de elección?",
     "opciones": [
       {
         "id": "A",
@@ -247,21 +247,21 @@ export const PREGUNTAS = [
       },
       {
         "id": "C",
-        "texto": "Cambio a sorafenib"
+        "texto": "Nirogacestat"
       },
       {
         "id": "D",
-        "texto": "Radioterapia externa sobre la masa"
+        "texto": "Sorafenib"
       },
       {
         "id": "E",
-        "texto": "Vigilancia y repetir TC en 6 meses"
+        "texto": "Seguir vigilando y repetir TC en 3 meses"
       }
     ],
     "correcta": "B",
-    "clave": "Doxorrubicina liposomal: la mejor relación entre profundidad y durabilidad de respuesta en enfermedad voluminosa.",
-    "explicacion": "En la serie del MSKCC, de los tratados con doxorrubicina liposomal en primera línea el 70% redujo tamaño, con una supervivencia libre de progresión a 5 años del 67,6% frente al 50,5% del resto de agentes. Las respuestas son duraderas: de 14 pacientes con regresión, solo 2 recrecieron, a los 11 y 36 meses de suspender, y ambos se manejaron con observación. En la raíz del mesenterio el bisturí es el tratamiento de más riesgo, no el de más control.",
-    "referencias": "Serie MSKCC 1993-2023 · Kasper B. JAMA Oncol 2024"
+    "clave": "Doxorrubicina liposomal: cuando la masa ya comprime el duodeno, hace falta una respuesta rápida y profunda.",
+    "explicacion": "La progresión en vigilancia activa con compresión duodenal es indicación de tratamiento activo, y la cirugía queda descartada por la localización. Nirogacestat es el único fármaco aprobado y el de mejor evidencia en progresión (DeFi: HR de progresión 0,29; respuesta objetiva del 41%), pero la mediana hasta la respuesta fue de 5,6 meses, y aquí la masa ya comprime el duodeno. En la serie del MSKCC, 14 de 20 pacientes con doxorrubicina liposomal en primera línea (70%) tuvieron regresión, con una supervivencia libre de progresión a 5 años del 67,6% frente al 50,5% del resto de agentes (diferencia no significativa). Las respuestas son duraderas: de 14 regresiones solo 2 recrecieron tras suspender. Nirogacestat y sorafenib siguen siendo opciones razonables cuando no hay compresión ni prisa.",
+    "referencias": "Serie MSKCC 1993-2023 · Gounder M. N Engl J Med 2023 (DeFi) · Kasper B. JAMA Oncol 2024"
   },
   {
     "id": "p9",
